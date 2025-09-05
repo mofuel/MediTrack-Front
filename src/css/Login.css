@@ -1,0 +1,49 @@
+body {
+  background-color: lightblue !important;
+  background:
+    linear-gradient(rgba(173, 216, 230, 0.6), rgba(173, 216, 230, 0.6)),
+    url('../assets/fondo.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.login-container {
+  max-width: 350px;
+  /* ancho máximo en pantallas grandes */
+  width: 100%;
+  /* ocupa todo el ancho disponible en pantallas pequeñas */
+  margin-left: auto;
+  /* alinea a la derecha */
+  margin-right: 0;
+  margin-top: 50px;
+}
+
+.login-container form {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.login-box {
+  background-color: rgba(255, 255, 255, 0.70);
+  border-radius: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  /* Activa flexbox */
+  flex-direction: column;
+  /* Apila elementos en columna */
+  align-items: center;
+  /* Centra horizontalmente */
+  justify-content: center;
+  /* Centra verticalmente */
+  text-align: center;
+  /* Centra el texto */
+}
+
+.login-box .form-control {
+  width: 80%;
+  /* Más pequeño que el 100% */
+  margin: 0 auto;
+}
