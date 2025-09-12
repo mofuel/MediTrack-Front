@@ -1,0 +1,20 @@
+.registro-form {
+    max-width: 700px;        /* limita el ancho total */
+    margin: 50px auto;       /* centra horizontal y agrega margen superior */
+    padding: 30px;           /* espacio interno */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.form-columns {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* columnas se apilan en móviles */
+}
+
+article.column {
+    flex: 1;
+    min-width: 300px; /* asegura que la columna no se haga muy pequeña */
+}

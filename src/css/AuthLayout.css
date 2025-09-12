@@ -1,0 +1,8 @@
+body.auth-body {
+  background-color: lightblue !important;
+  background:
+    linear-gradient(rgba(173, 216, 230, 0.6), rgba(173, 216, 230, 0.6)),
+    url('../assets/fondo.png');
+  background-size: cover;
+  background-position: center;
+}

@@ -1,12 +1,3 @@
-body {
-  background-color: lightblue !important;
-  background:
-    linear-gradient(rgba(173, 216, 230, 0.6), rgba(173, 216, 230, 0.6)),
-    url('../assets/fondo.png');
-  background-size: cover;
-  background-position: center;
-}
-
 .login-container {
   max-width: 350px;
   /* ancho máximo en pantallas grandes */
@@ -42,8 +33,8 @@ body {
   /* Centra el texto */
 }
 
-.login-box .form-control {
-  width: 80%;
-  /* Más pequeño que el 100% */
-  margin: 0 auto;
+.login-box .input-group {
+  width: 60%;        /* más pequeño */
+  max-width: 300px;  /* límite */
+  margin: 0 auto;    /* centrado */
 }
