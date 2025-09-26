@@ -1,0 +1,102 @@
+.servicios-container {
+  padding: 100px 20px;
+  max-width: 1200px;
+  margin: auto;
+  background-color: #fff;
+}
+
+.servicios-title {
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #020202;
+}
+
+.categorias-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.categoria-boton {
+  padding: 10px 20px;
+  border: 2px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.categoria-boton:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.categoria-boton.activa {
+  background-color: #007bff;
+  color: #fff;
+}
+
+
+.servicios-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+
+.servicio-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  width: 320px; /* ← ancho fijo */
+  margin: 0 auto; /* ← centrado si hay espacio */
+
+}
+
+.servicio-card:hover {
+  transform: translateY(-5px);
+}
+
+.servicio-imagen {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.servicio-titulo {
+  font-size: 1.5rem;
+  margin: 15px 0 10px;
+  color: #333;
+}
+
+.servicio-descripcion {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.btn-conoce-mas {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-conoce-mas:hover {
+  background-color: #0056b3;
+}

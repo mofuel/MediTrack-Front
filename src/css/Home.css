@@ -1,0 +1,393 @@
+.home-container {
+  padding: 100px 40px;
+  max-width: auto;
+}
+
+/* Encabezado */
+.welcome-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-title {
+  font-size: 60px;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 15px;
+}
+
+.welcome-subtext {
+  font-size: 22px;
+  color: #7f8c8d;
+}
+
+/* Menú de acciones rápidas */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+.action-button {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  width: 180px;
+  height: 140px;
+  text-align: center;
+  text-decoration: none;
+  color: #2c3e50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-button:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+
+.action-icon {
+  font-size: 36px;
+  color: #007bff;
+  margin-bottom: 12px;
+}
+
+
+.action-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+
+.robotic-surgery-section {
+  padding: 30px 80px;
+  background-color: #e6f0ff; /* Azul cielo suave */
+  border-radius: 50px;
+  margin-top: 60px;
+  
+}
+
+
+
+.robotic-surgery-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 40px;
+}
+
+
+
+.robotic-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+
+
+.robotic-title {
+  font-size: 40px; /* Más grande para destacar */
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+
+
+.robotic-description {
+  font-size: 20px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+
+.robotic-highlight {
+  font-size: 18px;
+  color: #007bff;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+
+
+.robotic-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+
+
+.robotic-button:hover {
+  background-color: #0056b3;
+}
+
+.robotic-image img {
+  width: 420px;
+  height: 480px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.specialties-section {
+  padding: 50px 20px;
+  background-color: transparent; /* Sin fondo */
+  margin-top: 30px;
+}
+
+
+
+.specialties-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #000000;
+  text-align: left;
+  margin-bottom: 40px;
+  line-height: 1.2;
+  margin-left: 20px;
+}
+
+
+.specialties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Más estrechas */
+  gap: 20px;
+  max-width: 1500px; /* Menor ancho total */
+  margin: 0 auto;
+}
+
+.specialty-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd; /* Borde visible */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 8px 8px;
+}
+
+.specialty-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.specialty-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.specialty-card h3 {
+  font-size: 20px;
+  color: #2c3e50;
+  margin: 20px 20px 10px;
+}
+
+.specialty-card p {
+  font-size: 15px;
+  color: #555;
+  margin: 0 20px 20px;
+  line-height: 1.5;
+}
+
+.specialty-button {
+  margin: 0 20px 20px;
+  padding: 8px 16px;
+  background-color: #fdfeff;
+  color: rgb(0, 0, 0);
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  align-self: flex-start;
+  transition: background-color 0.3s ease;
+  border: 2px solid #000000;
+  
+}
+
+.specialty-button:hover {
+  background-color: #b4bcc5;
+}
+
+
+.why-choose-us-section {
+  padding: 60px 0px;
+  background-color: #efeeff;
+  text-align: center;
+  width: auto;
+  margin: 0 auto;
+  border-radius: 50px;
+}
+
+.why-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 30px;
+}
+
+.why-description {
+  font-size: 18px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.why-accreditation {
+  font-size: 16px;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 30px;
+}
+.why-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.why-logo img {
+  width: 300px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.why-accreditation {
+  font-size: 16px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+
+.testimonial-box {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.testimonial-text {
+  font-size: 20px;
+  font-style: italic;
+  color: #050505;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.testimonial-author {
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+}
+
+ .location-section {
+  padding: 60px 20px;
+  background-color: #ffffff;
+  margin-top: 60px;
+}
+
+.location-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 40px;
+}
+
+.location-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.location-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 35px;
+  text-align: left;
+}
+
+.location-list {
+  list-style: none;
+  padding: 0;
+  font-size: 17px;
+  color: #333;
+}
+
+.location-item {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.location-header {
+  font-size: 18px;
+  font-weight: 600;
+  color: #020202;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.location-details {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.location-details p {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #444;
+}
+
+.location-button {
+  display: inline-block;
+  padding: 3px 5px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.location-button:hover {
+  background-color: #cbd4dd;
+  color: #000000;
+}
+
+.location-image img {
+  width: 100%;
+  max-width: 680px;
+  height: 450px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
