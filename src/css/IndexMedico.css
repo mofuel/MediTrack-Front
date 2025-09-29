@@ -1,0 +1,13 @@
+body {
+  margin: 0;                 /* Elimina márgenes por defecto */
+  padding: 0;
+  min-height: 100vh;         /* Garantiza que cubra toda la altura */
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}

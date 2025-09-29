@@ -1,0 +1,87 @@
+/* Fondo general */
+.perfil-medico-container {
+  background: linear-gradient(135deg, #e6f7ff 0%, #ffffff 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* Tarjeta principal */
+.perfil-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 40px 30px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.perfil-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Foto del médico */
+.perfil-foto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 4px solid #e6f7ff;
+}
+
+/* Nombre */
+.perfil-nombre {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Datos generales */
+.perfil-dato {
+  font-size: 1rem;
+  color: #555;
+  margin: 8px 0;
+}
+
+/* Especialidades/turnos en chips */
+.perfil-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.perfil-chip {
+  background: #e6f7ff;
+  color: #0077b6;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Botón para editar perfil */
+.btn-editar {
+  background: #0077b6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-editar:hover {
+  background: #005f87;
+}
