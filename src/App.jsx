@@ -4,8 +4,8 @@ import DashboardAdmin from "./pages/DashboardAdmin";
 function App() {
   return (
     <div>
-      <Login />
-      {/*<DashboardAdmin />*/}
+      {/*<Login />*/}
+      <DashboardAdmin/>
     </div>
   );
 }

@@ -1,93 +1,34 @@
 import { useState } from 'react';
 import '../css/Dash.css';
 
+// Importamos las vistas
+import VistaDashboard from "./viewsDashboardAdmin/VistaDashboard";
+import VistaCitas from "./viewsDashboardAdmin/VistaCitas";
+import VistaDoctores from "./viewsDashboardAdmin/VistaDoctores";
+import VistaReportes from "./viewsDashboardAdmin/VistaReportes";
+
 function DashboardAdmin() {
   const [activeSection, setActiveSection] = useState('dashboard');
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'patients', label: 'Pacientes'},
-    { id: 'appointments', label: 'Citas'},
-    { id: 'doctors', label: 'Doctores'},
-    { id: 'reports', label: 'Reportes'},
+    { id: 'citas', label: 'Citas' },
+    { id: 'doctores', label: 'Doctores' },
+    { id: 'reportes', label: 'Reportes' },
   ];
-
-  const renderDashboard = () => (
-    <div className="dashboard-content">
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h2>Total de Pacientes</h2>
-          <p className="stat-number">1000</p>
-        </div>
-        <div className="stat-card">
-          <h2>Citas Hoy</h2>
-          <p className="stat-number">20</p>
-        </div>
-        <div className="stat-card">
-          <h2>Doctores Activos</h2>
-          <p className="stat-number">5</p>
-        </div>
-        <div className="stat-card">
-          <h2>Ingresos del Mes</h2>
-          <p className="stat-number">$10000</p>
-        </div>
-      </div>
-      <div className="recent-section">
-        <h2>Últimas Citas</h2>
-        <ul className="recent-list">
-          <li>Paciente: Juan Pérez - 10:00 AM - Dr. López</li>
-          <li>Paciente: María García - 11:30 AM - Dr. Ruiz</li>
-          <li>Paciente: Carlos Mendoza - 14:00 PM - Dr. Soto</li>
-        </ul>
-      </div>
-    </div>
-  );
-
-  const renderPatients = () => (
-    <div className="section-content">
-      <h1>Gestión de Pacientes</h1>
-      <p>Sin funcionalidad aún T-T</p>
-      <button className="action-btn">Agregar Paciente</button>
-    </div>
-  );
-
-  const renderAppointments = () => (
-    <div className="section-content">
-      <h1>Gestión de Citas</h1>
-      <p>Calendario y lista de citas. (Sin funcionalidad aún)</p>
-      <button className="action-btn">Nueva Cita</button>
-    </div>
-  );
-
-  const renderDoctors = () => (
-    <div className="section-content">
-      <h1>Gestión de Doctores</h1>
-      <p>Lista de doctores y sus horarios. (Sin funcionalidad aún)</p>
-      <button className="action-btn">Agregar Doctor</button>
-    </div>
-  );
-
-  const renderReports = () => (
-    <div className="section-content">
-      <h1>Reportes</h1>
-      <p>Acá van los graficos pero no sé como colocarlos</p>
-    </div>
-  );
 
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
-        return renderDashboard();
-      case 'patients':
-        return renderPatients();
-      case 'appointments':
-        return renderAppointments();
-      case 'doctors':
-        return renderDoctors();
-      case 'reports':
-        return renderReports();
+        return <VistaDashboard />;
+      case 'citas':
+        return <VistaCitas />;
+      case 'doctores':
+        return <VistaDoctores />;
+      case 'reportes':
+        return <VistaReportes />;
       default:
-        return renderDashboard();
+        return <VistaDashboard />;
     }
   };
 
