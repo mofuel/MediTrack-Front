@@ -1,11 +1,12 @@
 import Login from "./pages/Login";
 import DashboardAdmin from "./pages/DashboardAdmin";
-
+import DashboardPaciente from "./pages/DashboardPaciente";
 function App() {
   return (
     <div>
-      <Login />
+      {/*<Login />*/}
       {/*<DashboardAdmin />*/}
+      <DashboardPaciente />
     </div>
   );
 }
