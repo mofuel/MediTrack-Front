@@ -1,0 +1,275 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  background-color: #242424; /* Fondo oscuro base, neutro */
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #1a1a1a;
+  padding: 1rem;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #60A5FA; /* Celeste suave para el título del sidebar (mantenido para branding) */
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-list li {
+  margin-bottom: 0.5rem;
+}
+
+.menu-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.8em 1em;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición suave solo en color y sombra */
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn:hover,
+.menu-btn.active {
+  background-color: #60A5FA; /* Celeste principal para activo */
+  color: white;
+  box-shadow: 0 1px 4px rgba(96, 165, 250, 0.2); /* Sombra sutil para visibilidad (reducida) */
+}
+
+.menu-btn:hover {
+  background-color: #93C5FD; /* Celeste más brillante para hover (visible pero calmado) */
+  box-shadow: 0 1px 4px rgba(96, 165, 250, 0.25); /* Sombra ligeramente más visible en hover, sin movimiento */
+}
+
+.icon {
+  margin-right: 0.5rem;
+  font-size: 1.2em;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logout-btn {
+  background-color: #60A5FA; /* Celeste para botón de logout */
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición suave solo en color y sombra */
+}
+
+.logout-btn:hover {
+  background-color: #93C5FD; /* Celeste más brillante para hover visible */
+  box-shadow: 0 1px 4px rgba(96, 165, 250, 0.25); /* Sombra sutil para elevación (reducida, sin desenfoque) */
+}
+
+.dashboard-content h1,
+.section-content h1 {
+  font-size: 2.5em;
+  margin-bottom: 1rem;
+  color: #333; /* Gris oscuro (#333) para títulos principales (neutro y legible) */
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  text-align: center;
+}
+
+.stat-card h2 {
+  margin: 0 0 0.5rem 0;
+  color: #60A5FA; /* Celeste para subtítulos de stats (mantenido para acento) */
+  font-size: 1.1em;
+}
+
+.stat-number {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #60A5FA; /* Celeste para números destacados (mantenido para énfasis) */
+  margin: 0;
+}
+
+.recent-section h2 {
+  margin-bottom: 1rem;
+  color: #60A5FA; /* Celeste para secciones recientes (mantenido para acento) */
+}
+
+.recent-list {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-list li {
+  background-color: #1a1a1a;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border-left: 4px solid #60A5FA; /* Borde celeste para items de lista */
+}
+
+.section-content p {
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.action-btn {
+  background-color: #60A5FA; /* Celeste para botones de acción */
+  color: white;
+  border: none;
+  padding: 0.8em 1.5em;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición suave solo en color y sombra */
+}
+
+.action-btn:hover {
+  background-color: #93C5FD; /* Celeste más brillante para hover visible */
+  box-shadow: 0 1px 4px rgba(96, 165, 250, 0.25); /* Sombra sutil para elevación (reducida, sin movimiento) */
+}
+
+/* Light mode adjustments */
+@media (prefers-color-scheme: light) {
+  .app-container {
+    background-color: #ffffff; /* Blanco puro para modo claro */
+    color: #1e293b; /* Gris oscuro para texto */
+  }
+
+  .sidebar {
+    background-color: #f8fafc; /* Gris muy claro, casi blanco */
+    border-right: 1px solid #e2e8f0; /* Borde gris suave */
+  }
+
+  .sidebar-header {
+    border-bottom: 1px solid #e2e8f0; /* Borde gris suave */
+  }
+
+  .sidebar-header h2 {
+    color: #60A5FA; /* Mantiene celeste para branding */
+  }
+
+  .menu-btn {
+    color: #475569; /* Gris medio para texto inactivo */
+  }
+
+  .menu-btn:hover,
+  .menu-btn.active {
+    background-color: #60A5FA; /* Celeste para activo */
+    color: white;
+    box-shadow: 0 1px 4px rgba(96, 165, 250, 0.1); /* Sombra más sutil en modo claro */
+  }
+
+  .menu-btn:hover {
+    background-color: #93C5FD; /* Celeste brillante para hover */
+    box-shadow: 0 1px 4px rgba(96, 165, 250, 0.15); /* Sombra aún más suave en claro */
+  }
+
+  .main-content {
+    color: #1e293b; /* Gris oscuro para contenido */
+  }
+
+  .header {
+    border-bottom: 1px solid #e2e8f0; /* Borde gris suave */
+  }
+
+  .user-info {
+    color: #1e293b;
+  }
+
+  .logout-btn {
+    background-color: #60A5FA;
+  }
+
+  .logout-btn:hover {
+    background-color: #93C5FD;
+    box-shadow: 0 1px 4px rgba(96, 165, 250, 0.15); /* Sombra sutil en modo claro */
+  }
+
+  .dashboard-content h1,
+  .section-content h1 {
+    color: #333; /* Gris oscuro (#333) para títulos en modo claro (alto contraste) */
+  }
+
+  .stat-card {
+    background-color: #f8fafc; /* Gris muy claro para cards */
+    border: 1px solid #e2e8f0; /* Borde gris suave */
+  }
+
+  .stat-card h2 {
+    color: #60A5FA; /* Celeste mantenido */
+  }
+
+  .stat-number {
+    color: #60A5FA; /* Celeste mantenido */
+  }
+
+  .recent-section h2 {
+    color: #60A5FA; /* Celeste mantenido */
+  }
+
+  .recent-list li {
+    background-color: #f8fafc; /* Gris muy claro */
+    border-left: 4px solid #60A5FA; /* Borde celeste */
+  }
+
+  .section-content p {
+    color: #64748b; /* Gris medio para párrafos */
+  }
+
+  .action-btn {
+    background-color: #60A5FA;
+  }
+
+  .action-btn:hover {
+    background-color: #93C5FD;
+    box-shadow: 0 1px 4px rgba(96, 165, 250, 0.15); /* Sombra sutil en modo claro */
+  }
+}

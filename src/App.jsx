@@ -8,7 +8,7 @@ import SolicitudesCitas from "./pages/SolicitudesCitas";
 import HistorialCitas from "./pages/HistorialCitas";
 import Notificaciones from "./pages/Notificaciones";
 import PerfilMedico from "./pages/PerfilMedico";
-
+import DashboardAdmin from "./pages/DashboardAdmin";
 
 function App() {
   return (
@@ -23,6 +23,7 @@ function App() {
         <Route path="/historial-citas" element={<HistorialCitas />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/perfil-medico" element={<PerfilMedico />} />
+        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
       </Routes>
     </Router>
   );
