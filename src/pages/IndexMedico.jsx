@@ -1,9 +1,15 @@
 import React from "react";
 import { Card } from "react-bootstrap";
-import NavMedico from "./NavMedico";
+import NavMedico from "../components/NavMedico";
+import EstadoBadge from "../components/EstadoBadge";
+import CitaRow from "../components/CitaRow";
+import FiltroEstado from "../components/FiltroEstado";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/IndexMedico.css";
+import '../css/colors.css';
+import {Button as RBButton} from "react-bootstrap";
+
 
 function IndexMedico() {
   const navigate = useNavigate();
@@ -12,7 +18,7 @@ function IndexMedico() {
     { text: "Solicitudes de Cita", path: "/solicitudes-citas", icon: "bi-calendar-check" },
     { text: "Historial de citas", path: "/historial-citas", icon: "bi-journal-medical" },
     { text: "Notificaciones", path: "/notificaciones", icon: "bi-bell" },
-    { text: "Perfil", path: "/perfil", icon: "bi-person-circle" },
+    { text: "Perfil", path: "/perfil-medico", icon: "bi-person-circle" },
   ];
 
   const citasHoy = [
@@ -25,48 +31,39 @@ function IndexMedico() {
     { id: 4, fecha: "26/09/2025", hora: "14:30", paciente: "Ana Ramos", confirmado: false },
   ];
 
+
   return (
     <>
     <NavMedico nombre="Pérez" />
     
-    <main className="container my-4">
-      <h1 className="text-center mb-4">Panel del Médico</h1>
+    {/* Área Principal */}
+      <main className="container my-4">
+        <div className="row">
+          {/* Columna izquierda */}
+          <div className="col-lg-7 mb-4">
+            <Card className="shadow-sm h-100">
+              <Card.Header className="card-header-azul">Citas de hoy</Card.Header>
+              <Card.Body>
+  {citasHoy.length === 0 ? (
+    <p className="text-center">No tienes citas para hoy</p>
+  ) : (
+    citasHoy.map(c => (
+      <CitaRow key={c.id} cita={c} tipo="hoy" />
+    ))
+  )}
+</Card.Body>
 
-      {/* Citas: dos columnas lado a lado */}
-      <section className="row mb-5">
-        {/* Citas de Hoy */}
-        <div className="col-md-6 mb-4">
-          <Card className="shadow-sm h-100">
-            <Card.Header className="text-center fw-bold">Citas de hoy</Card.Header>
-            <Card.Body>
-              {citasHoy.length === 0 ? (
-                <p className="text-center">No tienes citas para hoy</p>
-              ) : (
-                citasHoy.map(c => (
-                  <div key={c.id} className="d-flex align-items-center mb-3 p-3 border rounded">
-                    <i className="bi bi-check-circle-fill text-success fs-4 me-3"></i>
-                    <div className="flex-grow-1">
-                      <div className="fw-bold">{c.paciente}</div>
-                      <small className="text-muted">Hora: {c.hora}</small>
-                    </div>
-                    <span className="badge bg-success">Confirmado</span>
-                  </div>
-                ))
-              )}
-            </Card.Body>
-          </Card>
-        </div>
+            </Card>
+          </div>
 
-        {/* Próximas Citas */}
-        <div className="col-md-6 mb-4">
-          <Card className="shadow-sm h-100">
-            <Card.Header className="text-center fw-bold">Próximas citas</Card.Header>
-            <Card.Body>
-              {citasProximas.length === 0 ? (
-                <p className="text-center">No tienes próximas citas</p>
-              ) : (
-                citasProximas.map(c => (
-                  <div key={c.id} className="d-flex align-items-center mb-3 p-3 border rounded">
+          {/* Columna derecha */}
+          <div className="col-lg-5">
+            {/* Próximas citas */}
+            <Card className="shadow-sm mb-4">
+              <Card.Header className="card-header-azul">Próximas citas</Card.Header>
+              <Card.Body style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {citasProximas.map(c => (
+                  <div key={c.id} className="d-flex align-items-center mb-3 p-2 border rounded">
                     <i
                       className={`bi ${c.confirmado ? "bi-check-circle-fill text-success" : "bi-clock text-warning"} fs-4 me-3`}
                     ></i>
@@ -76,42 +73,37 @@ function IndexMedico() {
                         {c.fecha} — {c.hora}
                       </small>
                     </div>
-                    <span
-                      className={`badge ${c.confirmado ? "bg-success" : "bg-warning text-dark"}`}
-                    >
-                      {c.confirmado ? "Confirmado" : "Pendiente"}
-                    </span>
+                    <EstadoBadge estado={c.confirmado ? "aceptada" : "pendiente"} />
+
                   </div>
-                ))
-              )}
-            </Card.Body>
-          </Card>
+                ))}
+              </Card.Body>
+            </Card>
+
+            {/* Accesos Rápidos */}
+            <Card className="shadow-sm mb-4">
+              <Card.Header className="card-header-azul">Accesos Rápidos</Card.Header>
+              <Card.Body>
+                <div className="row g-3 text-center">
+                  {accesos.map(item => (
+                    <div key={item.text} className="col-6">
+                      <div
+                        className="p-3 border rounded h-100 card-hover"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(item.path)}
+                      >
+                        <i className={`bi ${item.icon} fs-2 text-primary`}></i>
+                        <div className="mt-2 small">{item.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card.Body>
+            </Card>
+
+          </div>
         </div>
-      </section>
-
-      {/* Accesos Rápidos */}
-      <section className="accesos-rapidos my-5">
-        <h2 className="mb-4 text-center">Accesos Rápidos</h2>
-
-        <section className="row g-4 justify-content-center">
-          {accesos.map((item) => (
-            <article key={item.text} className="col-6 col-md-3">
-              <Card
-                className="shadow-sm text-center h-100 card-hover"
-                style={{ cursor: "pointer" }}
-                onClick={() => navigate(item.path)}
-              >
-                <Card.Body>
-                  <i className={`bi ${item.icon} fs-1 text-primary mb-2`}></i>
-                  <Card.Title>{item.text}</Card.Title>
-                  <Card.Text>Ir a {item.text.toLowerCase()}</Card.Text>
-                </Card.Body>
-              </Card>
-            </article>
-          ))}
-        </section>
-      </section>
-    </main>
+      </main>
     </>
   );
 }

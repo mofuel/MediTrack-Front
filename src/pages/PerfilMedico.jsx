@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { Card, Button, Form } from "react-bootstrap";
-import NavMedico from "./NavMedico";
+import NavMedico from "../components/NavMedico";
+import EstadoBadge from "../components/EstadoBadge";
 import "../css/PerfilMedico.css";
+import { Row, Col, Modal } from "react-bootstrap";
+import CustomButton from "../components/Button";
+
+
+
 
 function PerfilMedico() {
   const [editando, setEditando] = useState(false);
@@ -62,109 +68,86 @@ function PerfilMedico() {
                     ))}
                 </div>
 
-                <p className="perfil-dato mt-3">
-                  <strong>Estado:</strong> {perfil.activo ? "Activo" : "Inactivo"}
-                </p>
+                <EstadoBadge estado={perfil.activo ? "activo" : "inactivo"} />
+
 
                 <button className="btn-editar mt-3" onClick={() => setEditando(true)}>
                   Editar perfil
                 </button>
               </>
             ) : (
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Nombre</Form.Label>
-                  <Form.Control
-                    name="nombre"
-                    value={perfil.nombre}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+              <Modal show={editando} onHide={() => setEditando(false)} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>Editar Perfil</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form>
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Código</Form.Label>
+                          <Form.Control
+                            name="codigo"
+                            value={perfil.codigo}
+                            onChange={handleChange}
+                            disabled
+                          />
+                        </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Apellido</Form.Label>
-                  <Form.Control
-                    name="apellido"
-                    value={perfil.apellido}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>DNI</Form.Label>
+                          <Form.Control
+                            name="dni"
+                            value={perfil.dni}
+                            onChange={handleChange}
+                          />
+                        </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>DNI</Form.Label>
-                  <Form.Control
-                    name="dni"
-                    value={perfil.dni}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Sexo</Form.Label>
+                          <Form.Select
+                            name="sexo"
+                            value={perfil.sexo}
+                            onChange={handleChange}
+                          >
+                            <option>Masculino</option>
+                            <option>Femenino</option>
+                            <option>Otro</option>
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Sexo</Form.Label>
-                  <Form.Select
-                    name="sexo"
-                    value={perfil.sexo}
-                    onChange={handleChange}
-                  >
-                    <option>Masculino</option>
-                    <option>Femenino</option>
-                    <option>Otro</option>
-                  </Form.Select>
-                </Form.Group>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Email</Form.Label>
+                          <Form.Control
+                            type="email"
+                            name="email"
+                            value={perfil.email}
+                            onChange={handleChange}
+                          />
+                        </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={perfil.email}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Teléfono</Form.Label>
+                          <Form.Control
+                            name="telefono"
+                            value={perfil.telefono}
+                            onChange={handleChange}
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Teléfono</Form.Label>
-                  <Form.Control
-                    name="telefono"
-                    value={perfil.telefono}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                  </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <CustomButton text="Guardar" onClick={guardarCambios} className="btn-success" />
+                  <CustomButton text="Cancelar" onClick={() => setEditando(false)} className="btn-secondary" />
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Turno</Form.Label>
-                  <Form.Select
-                    name="turno"
-                    value={perfil.turno}
-                    onChange={handleChange}
-                  >
-                    <option>Mañana</option>
-                    <option>Tarde</option>
-                    <option>Noche</option>
-                  </Form.Select>
-                </Form.Group>
+                </Modal.Footer>
+              </Modal>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Especialidades</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    name="especialidades"
-                    value={perfil.especialidades}
-                    onChange={handleChange}
-                    placeholder="Ej: Cardiología, Pediatría..."
-                  />
-                </Form.Group>
-
-                <div className="text-center">
-                  <Button variant="success" className="me-2" onClick={guardarCambios}>
-                    Guardar
-                  </Button>
-                  <Button variant="secondary" onClick={() => setEditando(false)}>
-                    Cancelar
-                  </Button>
-                </div>
-              </Form>
             )}
           </Card.Body>
         </Card>

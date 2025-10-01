@@ -1,0 +1,112 @@
+@import "./colors.css";
+
+
+
+.navbar-medico {
+    background-image: linear-gradient(to right, var(--color-primary), var(--color-primary));
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+    border-bottom: none;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    padding: 0.8rem 0;
+}
+
+.navbar-content-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+}
+
+.navbar-greeting {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-greeting .bi-person-badge {
+    font-size: 2.2rem;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-greeting h5 {
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+    margin-left: 0.75rem;
+}
+
+.navbar-greeting .small-date {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    margin-left: 0.75rem;
+}
+
+.navbar-actions {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon-action-container {
+    cursor: pointer; 
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.icon-action-container:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.726);
+}
+
+.icon-action-container i {
+    font-size: 1.5rem;
+    color: #0056b3;
+}
+
+.icon-action-logout {
+    background-color: rgb(255, 255, 255); 
+}
+
+.icon-action-logout:hover {
+    background-color: rgb(255, 255, 255);
+}
+.icon-action-logout i {
+    color: var(--color-danger);
+}
+
+.action-separator {
+    width: 1px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0.4);
+    margin: 0 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+    .navbar-greeting .small-date {
+        display: none !important; 
+    }
+    .navbar-greeting h5 {
+        font-size: 1.1rem;
+    }
+    .navbar-greeting .bi-person-badge {
+        font-size: 1.8rem;
+    }
+    .icon-action-container {
+        width: 40px;
+        height: 40px;
+    }
+    .icon-action-container i {
+        font-size: 1.3rem;
+    }
+}

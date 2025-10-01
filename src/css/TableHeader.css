@@ -1,0 +1,9 @@
+.table-header-primary th {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+

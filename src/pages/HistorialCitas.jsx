@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Table, Badge, Card, Form } from "react-bootstrap";
-import NavMedico from "./NavMedico";
+import { Table, Badge, Card, Form, Button } from "react-bootstrap";
+import NavMedico from "../components/NavMedico";
+import EstadoBadge from "../components/EstadoBadge";
+import FiltroEstado from "../components/FiltroEstado";
+import "../css/Colors.css";
+import "../css/TableHeader.css"
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 function HistorialCitas() {
-  // Datos de ejemplo; normalmente vendrían de la API
   const [citas] = useState([
     {
       id: 1,
@@ -25,10 +29,12 @@ function HistorialCitas() {
     },
   ]);
 
-  const [filtro, setFiltro] = useState("");
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("todos");
 
   const citasFiltradas = citas.filter((c) =>
-    c.paciente.toLowerCase().includes(filtro.toLowerCase())
+    c.paciente.toLowerCase().includes(filtroNombre.toLowerCase()) &&
+    (filtroEstado === "todos" || c.estado === filtroEstado)
   );
 
   return (
@@ -40,20 +46,28 @@ function HistorialCitas() {
 
         <Card className="shadow-sm">
           <Card.Body>
+            {/* Filtros */}
             <Form className="mb-3">
               <Form.Control
                 type="text"
                 placeholder="Buscar por nombre de paciente..."
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
+                value={filtroNombre}
+                onChange={(e) => setFiltroNombre(e.target.value)}
               />
             </Form>
+
+            <FiltroEstado
+              opciones={["todos", "completada", "cancelada"]}
+              activo={filtroEstado}
+              onChange={setFiltroEstado}
+            />
+
 
             {citasFiltradas.length === 0 ? (
               <p className="text-center">No hay citas en el historial.</p>
             ) : (
-              <Table responsive bordered hover className="align-middle">
-                <thead className="table-light">
+              <Table responsive hover className="align-middle">
+                <thead className="table-header-primary">
                   <tr>
                     <th>Paciente</th>
                     <th>Fecha</th>
@@ -65,19 +79,34 @@ function HistorialCitas() {
                 </thead>
                 <tbody>
                   {citasFiltradas.map((c) => (
-                    <tr key={c.id}>
-                      <td>{c.paciente}</td>
-                      <td>{c.fecha}</td>
-                      <td>{c.hora}</td>
-                      <td>{c.motivo}</td>
-                      <td>
-                        <Badge
-                          bg={c.estado === "completada" ? "success" : "secondary"}
-                        >
-                          {c.estado.charAt(0).toUpperCase() + c.estado.slice(1)}
-                        </Badge>
+                    <tr
+                      key={c.id}
+                      className={
+                        c.estado === "completada"
+                          ? "bg-success bg-opacity-10"
+                          : "bg-secondary bg-opacity-10"
+                      }
+                    >
+                      <td className="py-2">
+                        <i className="bi bi-person-circle text-primary me-2"></i>
+                        {c.paciente}
                       </td>
-                      <td>{c.observaciones}</td>
+                      <td className="py-2">
+                        <i className="bi bi-calendar-event me-2 text-secondary"></i>
+                        {c.fecha}
+                      </td>
+                      <td className="py-2">
+                        <i className="bi bi-clock me-2 text-secondary"></i>
+                        {c.hora}
+                      </td>
+                      <td className="py-2">{c.motivo}</td>
+                      <td className="py-2">
+                        <EstadoBadge estado={c.estado} />
+                      </td>
+                      <td className="py-2">
+                        <i className="bi bi-journal-text me-2 text-muted"></i>
+                        {c.observaciones}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
