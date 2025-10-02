@@ -1,0 +1,175 @@
+.investigacion-container {
+  padding: 120px 100px;
+  font-family: 'Arial', sans-serif;
+  background-color: #ffffff;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Secciones principales con layout en columnas */
+.intro,
+.filosofia,
+.consideraciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 4rem;
+  align-items: center;
+  padding: 20px 0px;
+  
+}
+
+/* Textos alineados y flexibles */
+.intro-text,
+.filosofia-text,
+.texto {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* Imágenes con estilo uniforme */
+.intro-image,
+.filosofia-image,
+.consideraciones-image {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Enlaces de contacto */
+.intro-links a {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.intro-links a:hover {
+  text-decoration: underline;
+}
+
+/* Sección de íconos */
+.iconos {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+
+.icono-item {
+  background-color: #f0f0f0;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+  margin: 0.5rem;
+  min-width: 200px;
+}
+
+/* Títulos */
+h1, h2, h3 {
+  color: #005288;
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .investigacion-container {
+    padding: 60px 20px;
+  }
+
+  .intro,
+  .filosofia,
+  .consideraciones {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .intro-image,
+  .filosofia-image,
+  .consideraciones-image {
+    max-width: 100%;
+  }
+
+  .iconos {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* --- Responsividad para Investigación --- */
+@media (max-width: 992px) {
+  .investigacion-container {
+    padding: 80px 40px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+
+  .intro,
+  .filosofia,
+  .consideraciones {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .intro-text p,
+  .filosofia-text p,
+  .texto p {
+    font-size: 1rem;
+  }
+
+  .iconos {
+    gap: 1rem;
+  }
+
+  .icono-item {
+    flex: 1 1 45%;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .investigacion-container {
+    padding: 60px 20px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .intro-links a {
+    font-size: 0.95rem;
+  }
+
+  .iconos {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icono-item {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+}

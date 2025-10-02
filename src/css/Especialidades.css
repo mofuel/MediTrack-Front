@@ -6,9 +6,9 @@
 }
 
 .especialidades-title {
-  font-size: 36px;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #000000;
+  color: #011e5e;
   text-align: center;
   margin-bottom: 40px;
 }
@@ -40,9 +40,9 @@
 
 .categoria-boton {
   padding: 10px 20px;
-  border: 2px solid #007bff;
+  border: 2px solid #000000;
   background-color: #fff;
-  color: #007bff;
+  color: #000000;
   border-radius: 30px;
   font-weight: 600;
   cursor: pointer;
@@ -50,12 +50,12 @@
 }
 
 .categoria-boton:hover {
-  background-color: #007bff;
+  background-color: #000000;
   color: #fff;
 }
 
 .categoria-boton.activa {
-  background-color: #007bff;
+  background-color: #000000;
   color: #fff;
 }
 
@@ -68,11 +68,11 @@
 .especialidad-card {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   background-color: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 16px;
-  padding: 30px;
+  border-radius: 20px;
+  padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -84,7 +84,7 @@
 
 .especialidad-icono {
   font-size: 48px;
-  color: #007bff;
+  color: #014691;
   margin-right: 30px;
   flex-shrink: 0;
 }
@@ -97,7 +97,8 @@
   font-size: 24px;
   font-weight: 700;
   color: #000;
-  margin-bottom: 10px;
+ 
+   margin: 0 0 8px 0;
 }
 
 .especialidad-info p {
@@ -105,10 +106,11 @@
   color: #444;
   line-height: 1.6;
   margin-bottom: 20px;
+  margin: 0;
 }
 
 .especialidad-boton {
-  background-color: #007bff;
+  background-color: #014fa1;
   color: #fff;
   border: none;
   width: 40px;
@@ -125,4 +127,81 @@
 
 .especialidad-boton:hover {
   background-color: #0056b3;
+}
+
+/* --- Responsividad para Especialidades --- */
+@media (max-width: 992px) {
+  .especialidades-container {
+    padding: 80px 20px;
+  }
+
+  .especialidades-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .especialidades-buscador {
+    max-width: 100%;
+    font-size: 15px;
+  }
+
+  .categoria-boton {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categorias-barra {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  .especialidades-lista {
+    gap: 20px;
+  }
+
+  .especialidad-card {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    padding: 15px;
+  }
+
+  .especialidad-icono {
+    font-size: 40px;
+    margin: 0 0 15px 0;
+  }
+
+  .especialidad-info h3 {
+    font-size: 20px;
+  }
+
+  .especialidad-info p {
+    font-size: 16px;
+  }
+
+  .especialidad-boton {
+    margin-left: 0;
+    margin-top: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .especialidades-title {
+    font-size: 1.6rem;
+  }
+
+  .especialidad-info h3 {
+    font-size: 18px;
+  }
+
+  .especialidad-info p {
+    font-size: 14px;
+  }
 }

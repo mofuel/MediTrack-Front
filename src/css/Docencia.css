@@ -1,0 +1,126 @@
+.docencia-container {
+  padding: 120px 80px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.intro-docencia {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: center;
+}
+
+.intro-text {
+  flex: 1;
+}
+
+.intro-image {
+  width: 350px;
+  border-radius: 8px;
+}
+
+.que-es {
+  margin-bottom: 3rem;
+}
+
+.formacion {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: flex-start;
+}
+
+.formacion-text {
+  flex: 1;
+}
+
+.formacion-image {
+  width: 400px;
+  border-radius: 8px;
+}
+
+ul {
+  margin-left: 20px;
+}
+
+h1, h2, h3 {
+  color: #005288;
+}
+
+@media (max-width: 768px) {
+  .intro-docencia, .formacion {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .intro-image, .formacion-image {
+    max-width: 100%;
+  }
+}
+
+/* --- Responsividad para Docencia --- */
+@media (max-width: 992px) {
+  .docencia-container {
+    padding: 80px 40px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .intro-docencia,
+  .formacion {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .intro-image,
+  .formacion-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .formacion-text ul {
+    text-align: left;
+    margin: 0 auto;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 576px) {
+  .docencia-container {
+    padding: 60px 20px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .intro-text p,
+  .formacion-text p {
+    font-size: 0.95rem;
+  }
+
+  .formacion-text ul li {
+    font-size: 0.9rem;
+  }
+}

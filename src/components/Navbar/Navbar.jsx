@@ -10,16 +10,20 @@ import serviciosImg from '../../assets/servicios.png';
 import investigacionImg from '../../assets/investigacion.png';
 import sedesImg from '../../assets/sedes.png';
 import promocionesImg from '../../assets/promociones.png';
+import docenciaImg from '../../assets/docencia.png';
+import informaciónProfesional from '../../assets/informacion-profesional.png';
 
 const menuItems = {
   'Para Pacientes': {
     Especialidades: ['Dermatología', 'Gastroenterología', 'Odontología', 'Ginecología', 'Neurología', 'Pediatría', 'Psiquiatría', 'Cardiología'],
-    Servicios: ['Médico Virtual', 'Atención a domicilio', 'Centro Estético', 'Chequeos Médicos', 'Sonrisa Total'],
-    Promociones: [],
+    Servicios: ['Médico Virtual', 'Atención a domicilio', 'Centro Estético', 'Chequeos Médicos', 'Sonrisa Total','Programa de maternidad','Cirugía Robótica'],
+    Promociones: ['Promociones'],
     Sedes: ['San Borja', 'Lima', 'Surco', 'San Isidro', 'La Molina'],
   },
   'Para Médicos': {
-    Investigación: ['Docencia', 'Información para Profesionales', 'Revista Interciencia Médica'],
+    Investigación: ['Investigacion'],
+    Docencia:['Docencia'],
+    'Información para Profesional': ['Información para Profesional'],
   },
 };
 
@@ -35,31 +39,48 @@ const menuVisuals = {
 };
 
 const subItemVisuals = {
-  Especialidades: {
-    image: especialidadesImg,
-    buttonText: 'Ver especialidades médicas →',
-  },
-  Servicios: {
-    image: serviciosImg,
-    buttonText: 'Explora nuestros servicios →',
-  },
-  Investigación: {
-    image: investigacionImg,
-    buttonText: 'Lee nuestras investigaciones →',
-  },
-  Sedes: {
-    image: sedesImg,
-    buttonText: 'Conoce nuestras Sedes →',
-  },
-  Promociones: {
-    image: promocionesImg,
-    buttonText: 'Promociones y Ofertas →',
-  },
+  Especialidades: { image: especialidadesImg, buttonText: 'Ver especialidades médicas →' },
+  Servicios: { image: serviciosImg, buttonText: 'Explora nuestros servicios →' },
+  Investigación: { image: investigacionImg, buttonText: 'Lee nuestras investigaciones →' },
+  Sedes: { image: sedesImg, buttonText: 'Conoce nuestras Sedes →' },
+  Promociones: { image: promocionesImg, buttonText: 'Promociones y Ofertas →' },
+  Docencia: { image: docenciaImg, buttonText: 'Explora aquí →' },
+  InformaciónProfesional: { image: informaciónProfesional, buttonText: 'Explora aquí →' },
+};
+
+const routeMap = {
+  'Dermatología': '/dermatologia',
+  'Gastroenterología': '/gastroenterologia',
+  'Odontología': '/odontologia',
+  'Ginecología': '/ginecologia',
+  'Neurología': '/neurologia',
+  'Pediatría': '/pediatria',
+  'Psiquiatría': '/psiquiatria',
+  'Cardiología': '/cardiologia',
+  'Atención a domicilio': '/atencion-domicilio',
+  'Médico Virtual': '/medico-virtual',
+  'Centro Estético': '/centro-estetico',
+  'Chequeos Médicos': '/chequeos-medicos',
+  'Sonrisa Total': '/sonrisa-total',
+  'Programa de maternidad': '/programa-maternidad',
+  'Cirugía Robótica': '/cirugia-robotica',
+  'Promociones': '/promociones',
+  'Sedes': '/sedes',
+  'San Borja': '/sede-san-borja',
+  'Lima': '/sede-lima',
+  'Surco': '/sede-surco',
+  'San Isidro': '/sede-san-isidro',
+  'La Molina': '/sede-la-molina',
+  'Investigacion': '/investigacion',
+  'Docencia': '/docencia',
+  'Información para Profesional': '/informacion-profesional',
+  'Quiénes Somos': '/sobre-nosotros',
 };
 
 const Navbar = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [activeSubItem, setActiveSubItem] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const timeoutRef = useRef(null);
 
   const handleEnter = (menu) => {
@@ -73,6 +94,11 @@ const Navbar = () => {
       setActiveMenu(null);
       setActiveSubItem(null);
     }, 300);
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    setActiveMenu(null); // Cierra dropdown al abrir/cerrar menú
   };
 
   const dropdownContent = (
@@ -93,15 +119,22 @@ const Navbar = () => {
             </div>
           ))}
       </div>
+
       <div className="dropdown-column">
         {activeSubItem &&
           menuItems[activeMenu] &&
           menuItems[activeMenu][activeSubItem]?.map((sub, index) => (
-            <div key={index} className="dropdown-subitem">
+            <Link
+              key={index}
+              to={routeMap[sub] || '/especialidades'}
+              className="dropdown-subitem"
+              onClick={handleLeave}
+            >
               {sub}
-            </div>
+            </Link>
           ))}
       </div>
+
       <div className="dropdown-column image-column">
         <div className="image-wrapper">
           <img
@@ -143,14 +176,17 @@ const Navbar = () => {
         <header className="navbar-container">
           <nav className="navbar">
             <div className="navbar-left">
-              
-            <Link to="/">
+              <Link to="/">
                 <img src={logo} alt="Logo Clínica" className="navbar-logo" />
               </Link>
-
             </div>
 
-            <ul className="navbar-menu">
+            {/* Botón hamburguesa */}
+            <button className="hamburger" onClick={toggleMenu}>
+              ☰
+            </button>
+
+            <ul className={`navbar-menu ${menuOpen ? 'active' : ''}`}>
               {Object.keys(menuItems).map((menu) => (
                 <li
                   key={menu}
@@ -164,9 +200,14 @@ const Navbar = () => {
                   </span>
                 </li>
               ))}
-              <li className="navbar-item">Para Empresas</li>
-              <li className="navbar-item">Blog Educativo</li>
-              <li className="navbar-item">Cirugía Robótica</li>
+
+              <li className="navbar-item">
+                <Link to="/sobre-nosotros" className="navbar-link">Sobre Nosotros</Link>
+              </li>
+
+              <li className="navbar-item">
+                <Link to="/cirugia-robotica" className="navbar-link">Cirugía Robótica</Link>
+              </li>
             </ul>
 
             <div className="navbar-right">
@@ -181,7 +222,6 @@ const Navbar = () => {
         </header>
       </div>
 
-      {/* Renderizar el dropdown en el portal */}
       {activeMenu &&
         ReactDOM.createPortal(dropdownContent, document.getElementById('dropdown-portal'))}
     </>

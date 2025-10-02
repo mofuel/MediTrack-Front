@@ -1,0 +1,129 @@
+.libro-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 80px 100px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.libro-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #003366;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.libro-subtitle {
+  text-align: center;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.libro-form .form-group {
+  margin-bottom: 15px;
+}
+
+.libro-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.libro-form input,
+.libro-form select,
+.libro-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.btn-enviar {
+  width: 100%;
+  background: #007bff;
+  color: #fff;
+  padding: 12px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-enviar:hover {
+  background: #0056b3;
+}
+
+.libro-aviso {
+  font-size: 12px;
+  color: #777;
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* --- Responsividad para Libro de Reclamaciones --- */
+@media (max-width: 992px) {
+  .libro-container {
+    padding: 60px 40px;
+    margin: 20px;
+  }
+
+  .libro-title {
+    font-size: 24px;
+  }
+
+  .libro-subtitle {
+    font-size: 14px;
+  }
+
+  .libro-form input,
+  .libro-form select,
+  .libro-form textarea {
+    font-size: 15px;
+    padding: 8px;
+  }
+
+  .btn-enviar {
+    font-size: 16px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .libro-container {
+    padding: 40px 20px;
+    margin: 10px;
+  }
+
+  .libro-title {
+    font-size: 20px;
+  }
+
+  .libro-subtitle {
+    font-size: 13px;
+  }
+
+  .libro-form label {
+    font-size: 14px;
+  }
+
+  .libro-form input,
+  .libro-form select,
+  .libro-form textarea {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .btn-enviar {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .libro-aviso {
+    font-size: 11px;
+  }
+}

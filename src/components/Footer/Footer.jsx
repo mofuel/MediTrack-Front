@@ -26,15 +26,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Institucional */}
+          
+{/* Institucional */}
           <div className="footer-column">
             <h3 className="footer-title">Institucional</h3>
             <ul>
-              <li>Derechos de los pacientes</li>
-              <li>Quiénes Somos</li>
-              <li>Acreditaciones</li>
-              <li>Convenios de Salud</li>
-              <li>Trabaja con Nosotros</li>
+              
+              <li><Link to="/sobre-nosotros">Quiénes Somos</Link></li>
             </ul>
           </div>
 
@@ -42,13 +40,11 @@ const Footer = () => {
           <div className="footer-column">
             <h3 className="footer-title">Pacientes</h3>
             <ul>
-              <li>Especialidades</li>
-              <li>Unidades especializadas</li>
-              <li>Servicios</li>
-              <li>Staff Médico</li>
-              <li>Sedes</li>
-              <li>Centro Estético</li>
-              <li>Promociones y Ofertas</li>
+              <li><Link to="/especialidades">Especialidades</Link></li>
+              <li><Link to="/servicios">Servicios</Link></li>
+              <li><Link to="/sedes">Sedes</Link></li>
+              <li><Link to="/centro-estetico">Centro Estético</Link></li>
+              <li><Link to="/promociones">Promociones y Ofertas</Link></li>
             </ul>
           </div>
 
@@ -56,22 +52,18 @@ const Footer = () => {
           <div className="footer-column">
             <h3 className="footer-title">Médicos</h3>
             <ul>
-              <li>Investigación</li>
-              <li>Revista Interclínica Médica</li>
-              <li>Información para Profesionales</li>
-              <li>Convenios Académicos</li>
+              <li><Link to="/investigacion">Investigación</Link></li>
+              <li><Link to="/informacion-profesional">Información para Profesionales</Link></li>
             </ul>
           </div>
 
           {/* Libro de Reclamaciones */}
-          
-            <div className="footer-column libro">
+          <div className="footer-column libro">
             <FaBookOpen className="book-icon" />
             <Link to="/libro-reclamaciones" className="libro-link">
-                Libro de Reclamaciones
+              Libro de Reclamaciones
             </Link>
-            </div>
-
+          </div>
         </div>
 
         <div className="footer-bottom">

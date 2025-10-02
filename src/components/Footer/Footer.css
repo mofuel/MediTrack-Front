@@ -8,6 +8,7 @@
   background-color: #f9f9f9;
   padding: 50px 50px 30px;
   border-top: 1px solid #ddd;
+  color: #001f4e;
 }
 
 .footer-grid {
@@ -115,4 +116,74 @@
 
 .libro-link:hover {
   border-bottom: 2px solid #000000;
+}
+
+
+.footer-column a {
+  text-decoration: none; /* Quita el subrayado */
+  color: #333; /* Color neutro para el texto */
+  font-size: 15px;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+}
+
+.footer-column a:hover {
+  color: #007bff; /* Color al pasar el mouse */
+  border-bottom: 1px solid #007bff; /* Línea elegante en hover */
+}
+
+
+.footer-column a:hover {
+  color: #000; /* Un poco más oscuro */
+  border-bottom: none;
+}
+
+
+/* --- Responsividad Footer --- */
+@media (max-width: 992px) {
+  .footer {
+    padding: 40px 20px;
+  }
+
+  .footer-grid {
+    gap: 20px;
+  }
+
+  .footer-title {
+    font-size: 16px;
+  }
+
+  .footer-column ul li,
+  .footer-column a {
+    font-size: 14px;
+  }
+
+  .social-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-grid {
+    grid-template-columns: 1fr; /* Una sola columna */
+    text-align: center;
+  }
+
+  .footer-column {
+    align-items: center;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .libro {
+    margin-top: 20px;
+  }
+
+  .footer-bottom {
+    font-size: 13px;
+    margin-top: 20px;
+  }
 }

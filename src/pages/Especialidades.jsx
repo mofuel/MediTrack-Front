@@ -18,56 +18,56 @@ const especialidadesData = [
     nombre: 'Dermatología',
     descripcion: 'Diagnóstico y tratamiento de enfermedades de la piel.',
     icono: <FaSmile />,
-    ruta: '/especialidades/dermatologia',
+    ruta: '/dermatologia',
     categoria: 'diagnostico'
   },
   {
     nombre: 'Gastroenterología',
     descripcion: 'Trastornos del sistema digestivo.',
     icono: <FaNotesMedical />,
-    ruta: '/especialidades/gastroenterologia',
+    ruta: '/gastroenterologia',
     categoria: 'diagnostico'
   },
   {
     nombre: 'Odontología',
     descripcion: 'Salud bucal y tratamientos dentales.',
     icono: <FaTooth />,
-    ruta: '/especialidades/odontologia',
+    ruta: '/odontologia',
     categoria: 'especializada'
   },
   {
     nombre: 'Ginecología',
     descripcion: 'Salud femenina y sistema reproductor.',
     icono: <FaUserMd />,
-    ruta: '/especialidades/ginecologia',
+    ruta: '/ginecologia',
     categoria: 'especializada'
   },
   {
     nombre: 'Neurología',
     descripcion: 'Trastornos del sistema nervioso.',
     icono: <FaBrain />,
-    ruta: '/especialidades/neurologia',
+    ruta: '/neurologia',
     categoria: 'especializada'
   },
   {
     nombre: 'Pediatría',
     descripcion: 'Atención médica para niños y adolescentes.',
     icono: <FaBaby />,
-    ruta: '/especialidades/pediatria',
+    ruta: '/pediatria',
     categoria: 'infantil'
   },
   {
     nombre: 'Psiquiatría',
     descripcion: 'Salud mental y emocional.',
     icono: <FaStethoscope />,
-    ruta: '/especialidades/psiquiatria',
+    ruta: '/psiquiatria',
     categoria: 'mental'
   },
   {
     nombre: 'Cardiología',
     descripcion: 'Enfermedades del corazón y sistema cardiovascular.',
     icono: <FaHeartbeat />,
-    ruta: '/especialidades/cardiologia',
+    ruta: '/cardiologia',
     categoria: 'especializada'
   }
 ];

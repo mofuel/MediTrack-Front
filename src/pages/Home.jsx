@@ -87,19 +87,19 @@ const Home = () => {
               <img src={pediatriaImg} alt="Pediatría" />
               <h3>Pediatría</h3>
               <p>Atención integral para niños y adolescentes, enfocada en su desarrollo y bienestar.</p>
-              <Link to="/especialidades/pediatria" className="specialty-button">Conoce más</Link>
+              <Link to="/pediatria" className="specialty-button">Conoce más</Link>
             </div>
             <div className="specialty-card">
               <img src={cardiologiaImg} alt="Cardiología" />
               <h3>Cardiología</h3>
               <p>Prevención, diagnóstico y tratamiento de enfermedades del corazón y sistema cardiovascular.</p>
-              <Link to="/especialidades/cardiologia" className="specialty-button">Conoce más</Link>
+              <Link to="/cardiologia" className="specialty-button">Conoce más</Link>
             </div>
             <div className="specialty-card">
               <img src={odontologiaImg} alt="Odontología" />
               <h3>Odontología</h3>
               <p>Servicios dentales especializados para mantener tu salud bucal en óptimas condiciones.</p>
-              <Link to="/especialidades/odontologia" className="specialty-button">Conoce más</Link>
+              <Link to="/odontologia" className="specialty-button">Conoce más</Link>
             </div>
             <div className="specialty-card">
               <img src={masImg} alt="Más especialidades" />
@@ -135,31 +135,31 @@ const Home = () => {
             <h2 className="location-title">Encuentra una sede <br />cerca de ti.</h2>
             <ul className="location-list">
                 {[
-                {
+                  {
                     nombre: 'San Borja',
                     direccion: 'Av. Guardia Civil 385 - 433',
-                    enlace: '/sedes/san-borja'
-                },
-                {
+                    enlace: '/sede-san-borja'
+                  },
+                  {
                     nombre: 'Lima',
                     direccion: 'Av. Inca Garcilaso de la Vega 1420',
-                    enlace: '/sedes/lima'
-                },
-                {
+                    enlace: '/sede-lima'
+                  },
+                  {
                     nombre: 'Surco',
                     direccion: 'Av. Caminos del Inca 1234',
-                    enlace: '/sedes/surco'
-                },
-                {
+                    enlace: '/sede-surco'
+                  },
+                  {
                     nombre: 'San Isidro',
                     direccion: 'Av. Javier Prado Este 567',
-                    enlace: '/sedes/san-isidro'
-                },
-                {
+                    enlace: '/sede-san-isidro'
+                  },
+                  {
                     nombre: 'La Molina',
                     direccion: 'Av. La Molina 789',
-                    enlace: '/sedes/la-molina'
-                }
+                    enlace: '/sede-la-molina'
+                  }
                 ].map((sede, index) => (
                 <li key={index} className="location-item">
                     <div

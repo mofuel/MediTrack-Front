@@ -27,7 +27,7 @@ const servicios = [
     titulo: 'Médico Virtual',
     descripcion: 'Consulta médica desde casa con nuestros especialistas.',
     imagen: medicoVirtual,
-    link: '/servicios/medico-virtual',
+    link: '/medico-virtual', // ✅ Ruta directa
     categoria: 'atencion-medica',
   },
   {
@@ -35,7 +35,7 @@ const servicios = [
     titulo: 'Atención a Domicilio',
     descripcion: 'Recibe atención médica en la comodidad de tu hogar.',
     imagen: atencionDomicilio,
-    link: '/servicios/atencion-domicilio',
+    link: '/atencion-domicilio',
     categoria: 'atencion-medica',
   },
   {
@@ -43,7 +43,7 @@ const servicios = [
     titulo: 'Chequeo Médico',
     descripcion: 'Evaluación integral para tu bienestar.',
     imagen: chequeoMedico,
-    link: '/servicios/chequeo-medico',
+    link: '/chequeos-medicos',
     categoria: 'prevencion',
   },
   {
@@ -51,7 +51,7 @@ const servicios = [
     titulo: 'Programa de Maternidad',
     descripcion: 'Acompañamiento completo durante tu embarazo.',
     imagen: programaMaternidad,
-    link: '/servicios/programa-maternidad',
+    link: '/programa-maternidad',
     categoria: 'maternidad',
   },
   {
@@ -59,7 +59,7 @@ const servicios = [
     titulo: 'Sonrisa Total',
     descripcion: 'Tratamientos dentales para una sonrisa saludable.',
     imagen: sonrisaTotal,
-    link: '/servicios/sonrisa-total',
+    link: '/sonrisa-total',
     categoria: 'sonrisa',
   },
   {
@@ -67,7 +67,7 @@ const servicios = [
     titulo: 'Centro Estético',
     descripcion: 'Servicios estéticos para tu bienestar y belleza.',
     imagen: centroEstetico,
-    link: '/servicios/centro-estetico',
+    link: '/centro-estetico',
     categoria: 'estetico',
   },
   {
@@ -75,7 +75,7 @@ const servicios = [
     titulo: 'Cirugía Robótica',
     descripcion: 'Tecnología avanzada para procedimientos precisos.',
     imagen: cirugiaRobotica,
-    link: '/servicios/cirugia-robotica',
+    link: '/cirugia-robotica',
     categoria: 'robotica',
   },
 ];
