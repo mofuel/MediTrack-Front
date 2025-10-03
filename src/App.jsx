@@ -24,8 +24,8 @@ function App() {
         <Route path="/historial-citas" element={<HistorialCitas />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/perfil-medico" element={<PerfilMedico />} />
-        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-        <Route path="/dashboard-paciente" element={<DashboardPaciente />} />
+        <Route path="/dashboard-admin/*" element={<DashboardAdmin />} />
+        <Route path="/dashboard-paciente/*" element={<DashboardPaciente />} />
       </Routes>
     </Router>
   );

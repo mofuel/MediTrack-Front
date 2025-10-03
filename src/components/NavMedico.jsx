@@ -1,17 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar, Container } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/NavMedico.css";
-import logoMedico from "../assets/lgg.PNG";
-import { Link } from "react-router-dom";
+import logoMedico from "../assets/logg.png";
+import { Link, useNavigate } from "react-router-dom";
 
-function NavMedico({ nombre = "Apellido", onLogout }) {
+function NavMedico() {
+  const navigate = useNavigate();
+  const [nombreCompleto, setNombreCompleto] = useState("Apellido");
+
   const fecha = new Date().toLocaleDateString("es-PE", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+
+  // Obtener datos del medico desde localStorage
+  useEffect(() => {
+    const codigoUsuario = localStorage.getItem("codigoUsuario");
+    if (!codigoUsuario) return;
+
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    const usuario = usuarios[codigoUsuario];
+
+    if (usuario) {
+      setNombreCompleto(`${usuario.nombre} ${usuario.apellido}`);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Borrar datos de sesión
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("codigoUsuario");
+
+    // Redirigir al login
+    navigate("/");
+  };
 
   return (
     <Navbar className="shadow-sm navbar-medico">
@@ -29,7 +55,7 @@ function NavMedico({ nombre = "Apellido", onLogout }) {
             </Link>
 
             <div>
-              <h5 className="mb-0">Hola, Dr. {nombre}</h5>
+              <h5 className="mb-0">Hola, Dr. {nombreCompleto}</h5>
               <span className="small-date">{fecha}</span>
             </div>
           </div>
@@ -52,7 +78,7 @@ function NavMedico({ nombre = "Apellido", onLogout }) {
             <div
               className="icon-action-container icon-action-logout"
               title="Cerrar sesión"
-              onClick={onLogout}
+              onClick={handleLogout}
             >
               <i className="bi bi-box-arrow-right"></i>
             </div>

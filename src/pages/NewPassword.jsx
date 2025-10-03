@@ -13,7 +13,7 @@ function NewPassword() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Recibimos token y email desde el flujo anterior (Login.jsx)
+    // Recibimos token y email desde el flujo anterior 
     const { email, token } = location.state || {};
 
     const [newPassword, setNewPassword] = useState("");
@@ -88,8 +88,6 @@ function NewPassword() {
                     </section>
                 </form>
             </main>
-
-
         </AuthLayout>
     );
 }

@@ -1,29 +1,34 @@
-import React, { useState } from "react";
-import { Card, Button, Form } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Card, Form, Row, Col, Modal } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
 import EstadoBadge from "../components/EstadoBadge";
-import "../css/PerfilMedico.css";
-import { Row, Col, Modal } from "react-bootstrap";
 import CustomButton from "../components/Button";
-
-
-
+import SelectField from "../components/SelectField";
+import "../css/PerfilMedico.css";
 
 function PerfilMedico() {
   const [editando, setEditando] = useState(false);
+  const [perfil, setPerfil] = useState(null);
 
-  const [perfil, setPerfil] = useState({
-    codigo: "MED001",
-    nombre: "Juan",
-    apellido: "Pérez",
-    dni: "12345678",
-    sexo: "Masculino",
-    email: "juan.perez@hospital.com",
-    telefono: "+51 987 654 321",
-    activo: true,
-    turno: "Mañana",
-    especialidades: "Cardiología, ECG",
-  });
+  const codigoMedico = localStorage.getItem("codigoUsuario");
+
+  useEffect(() => {
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    const medico = usuarios[codigoMedico];
+
+    if (medico) {
+      setPerfil({
+        codigo: medico.codigo || "",
+        nombre: medico.nombre || "",
+        apellido: medico.apellido || "",
+        dni: medico.dni || "",
+        sexo: medico.sexo || "",
+        email: medico.email || "",
+        telefono: medico.telefono || "",
+        estado: medico.estado || "Activo",
+      });
+    }
+  }, [codigoMedico]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,24 +36,24 @@ function PerfilMedico() {
   };
 
   const guardarCambios = () => {
-    console.log("Guardando cambios:", perfil);
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    usuarios[codigoMedico] = { ...usuarios[codigoMedico], ...perfil };
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
     setEditando(false);
   };
+
+  if (!perfil) return <p>Cargando perfil...</p>;
 
   return (
     <>
       <NavMedico nombre={perfil.apellido} />
 
-      {/* Contenedor con tu gradiente */}
       <main className="perfil-medico-container">
         <Card className="perfil-card shadow-sm">
           <Card.Body>
             {!editando ? (
               <>
-                {/* Nombre grande con tu clase */}
-                <h2 className="perfil-nombre mb-3">
-                  {perfil.nombre} {perfil.apellido}
-                </h2>
+                <h2 className="perfil-nombre mb-3">{perfil.nombre} {perfil.apellido}</h2>
 
                 <p className="perfil-dato"><strong>Código:</strong> {perfil.codigo}</p>
                 <p className="perfil-dato"><strong>DNI:</strong> {perfil.dni}</p>
@@ -56,20 +61,7 @@ function PerfilMedico() {
                 <p className="perfil-dato"><strong>Email:</strong> {perfil.email}</p>
                 <p className="perfil-dato"><strong>Teléfono:</strong> {perfil.telefono || "—"}</p>
 
-                {/* Chips para turno y especialidades */}
-                <div className="perfil-chips">
-                  <span className="perfil-chip">{perfil.turno}</span>
-                  {perfil.especialidades
-                    .split(",")
-                    .map((esp) => (
-                      <span key={esp.trim()} className="perfil-chip">
-                        {esp.trim()}
-                      </span>
-                    ))}
-                </div>
-
-                <EstadoBadge estado={perfil.activo ? "activo" : "inactivo"} />
-
+                <EstadoBadge estado={perfil.estado === "Activo" ? "activo" : "inactivo"} />
 
                 <button className="btn-editar mt-3" onClick={() => setEditando(true)}>
                   Editar perfil
@@ -85,12 +77,20 @@ function PerfilMedico() {
                     <Row>
                       <Col md={6}>
                         <Form.Group className="mb-3">
-                          <Form.Label>Código</Form.Label>
+                          <Form.Label>Nombre</Form.Label>
                           <Form.Control
-                            name="codigo"
-                            value={perfil.codigo}
+                            name="nombre"
+                            value={perfil.nombre}
                             onChange={handleChange}
-                            disabled
+                          />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                          <Form.Label>Apellido</Form.Label>
+                          <Form.Control
+                            name="apellido"
+                            value={perfil.apellido}
+                            onChange={handleChange}
                           />
                         </Form.Group>
 
@@ -105,15 +105,16 @@ function PerfilMedico() {
 
                         <Form.Group className="mb-3">
                           <Form.Label>Sexo</Form.Label>
-                          <Form.Select
+                          <SelectField
                             name="sexo"
                             value={perfil.sexo}
                             onChange={handleChange}
-                          >
-                            <option>Masculino</option>
-                            <option>Femenino</option>
-                            <option>Otro</option>
-                          </Form.Select>
+                            options={[
+                              { value: "FEMENINO", label: "FEMENINO" },
+                              { value: "MASCULINO", label: "MASCULINO" }
+                            ]}
+                            placeholder="Seleccione sexo"
+                          />
                         </Form.Group>
                       </Col>
 
@@ -138,16 +139,13 @@ function PerfilMedico() {
                         </Form.Group>
                       </Col>
                     </Row>
-
                   </Form>
                 </Modal.Body>
                 <Modal.Footer>
                   <CustomButton text="Guardar" onClick={guardarCambios} className="btn-success" />
                   <CustomButton text="Cancelar" onClick={() => setEditando(false)} className="btn-secondary" />
-
                 </Modal.Footer>
               </Modal>
-
             )}
           </Card.Body>
         </Card>

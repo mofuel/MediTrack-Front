@@ -9,10 +9,12 @@ import SelectField from "../components/SelectField";
 import AuthLayout from "../layouts/AuthLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faPhone, faIdCard, faVenusMars } from "@fortawesome/free-solid-svg-icons";
-
+import { useNavigate } from "react-router-dom";
 
 
 function RegistroForm() {
+    const navigate = useNavigate();
+
     const [form, setForm] = useState({
         nombre: "",
         apellido: "",
@@ -31,16 +33,29 @@ function RegistroForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!form.sexo) {
+        // Validar campos obligatorios
+        const camposVacios = Object.entries(form)
+            .filter(([, valor]) => !valor)
+            .map(([nombre]) => nombre);
+
+        if (camposVacios.length > 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Campo requerido',
-                text: 'Por favor selecciona Masculino o Femenino',
+                title: 'Campos incompletos',
+                text: `Por favor completa los siguientes campos: ${camposVacios.join(', ')}`,
             });
             return;
         }
 
-
+        // Validar contraseñas
+        if (form.password !== form.confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseñas no coinciden',
+                text: 'Por favor verifica tu contraseña y su confirmación',
+            });
+            return;
+        }
 
         try {
             const resp = await fetch("http://localhost:8080/api/users/register", {
@@ -50,6 +65,7 @@ function RegistroForm() {
             });
 
             const text = await resp.text();
+
             if (!resp.ok) {
                 Swal.fire({
                     icon: 'error',
@@ -61,6 +77,20 @@ function RegistroForm() {
                     icon: 'success',
                     title: 'Registro exitoso',
                     text: text
+                }).then(() => {
+                    navigate("/");
+                });
+
+                // Limpiar formulario
+                setForm({
+                    nombre: "",
+                    apellido: "",
+                    dni: "",
+                    telefono: "",
+                    email: "",
+                    sexo: "",
+                    password: "",
+                    confirmPassword: ""
                 });
             }
         } catch (err) {
@@ -72,6 +102,8 @@ function RegistroForm() {
             });
         }
     };
+
+
 
 
     return (

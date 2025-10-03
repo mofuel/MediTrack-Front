@@ -1,35 +1,65 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../css/Dash.css';
+import '../css/colors.css';
+import logo from '../assets/logg.png';
 
-// Importamos las vistas
 import VistaDashboard from "./viewsDashboardAdmin/VistaDashboard";
 import VistaCitas from "./viewsDashboardAdmin/VistaCitas";
 import VistaDoctores from "./viewsDashboardAdmin/VistaDoctores";
 import VistaReportes from "./viewsDashboardAdmin/VistaReportes";
+import VistaEspecialidad from "./viewsDashboardAdmin/VistaEspecialidad";
+import VistaPacientes from './viewsDashboardAdmin/VistaPacientes';
 
 function DashboardAdmin() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
+
+  // Inicializa especialidades solo si no existe
+  useEffect(() => {
+    if (!localStorage.getItem("especialidades")) {
+      localStorage.setItem("especialidades", JSON.stringify([]));
+    }
+  }, []);
+
+
+  const codigoUsuario = localStorage.getItem("codigoUsuario");
+  const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+  const nombreUsuario = usuarios[codigoUsuario]?.nombre || "Usuario";
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'citas', label: 'Citas' },
+    { id: 'pacientes', label: 'Pacientes' },
     { id: 'doctores', label: 'Doctores' },
-    { id: 'reportes', label: 'Reportes' },
+    { id: 'citas', label: 'Citas' },
+    { id: 'especialidades', label: 'Especialidades' },
   ];
 
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
         return <VistaDashboard />;
+      case 'pacientes':
+        return <VistaPacientes />;
       case 'citas':
         return <VistaCitas />;
       case 'doctores':
         return <VistaDoctores />;
       case 'reportes':
         return <VistaReportes />;
+      case 'especialidades':
+        return <VistaEspecialidad />;
       default:
         return <VistaDashboard />;
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("codigoUsuario");
+
+    navigate("/");
   };
 
   return (
@@ -37,7 +67,7 @@ function DashboardAdmin() {
       {/* Sidebar */}
       <nav className="sidebar">
         <div className="sidebar-header">
-          <h2>DashAdmin</h2>
+          <img src={logo} alt="Logo DashAdmin" className="logo-img" />
         </div>
         <ul className="menu-list">
           {menuItems.map((item) => (
@@ -58,8 +88,11 @@ function DashboardAdmin() {
       <main className="main-content">
         <header className="header">
           <h1>Panel de Administración</h1>
-          <div className="user-info">
-            <button className="logout-btn">Cerrar Sesión</button>
+          <div className="user-info d-flex align-items-center gap-3">
+            <span className="fw-semibold">Hola, {nombreUsuario}</span>
+            <button className="logout-btn" onClick={handleLogout}>
+              Cerrar Sesión
+            </button>
           </div>
         </header>
         {renderContent()}

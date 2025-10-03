@@ -40,7 +40,6 @@ function Login() {
 
       const data = await res.json();
 
-      // SweetAlert con .then para abrir el segundo modal
       Swal.fire({
         icon: "success",
         title: "Correo enviado",
@@ -60,38 +59,37 @@ function Login() {
 
 
   const handleValidarToken = async () => {
-  try {
-    const res = await fetch("http://localhost:8080/password/validate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: emailRecuperar,
-        token: tokenIngresado
-      }),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/password/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailRecuperar,
+          token: tokenIngresado
+        }),
+      });
 
-    if (!res.ok) throw new Error("Token inválido o expirado");
+      if (!res.ok) throw new Error("Token inválido o expirado");
 
-    const tokenTemp = tokenIngresado; // Guardamos antes de limpiar
+      const tokenTemp = tokenIngresado;
 
-    Swal.fire(
-      "Éxito",
-      "Token verificado. Ahora podrás cambiar tu contraseña.",
-      "success"
-    ).then(() => {
-      setShowTokenModal(false);
-      setTokenIngresado("");
-      setEmailRecuperar("");
+      Swal.fire(
+        "Éxito",
+        "Token verificado. Ahora podrás cambiar tu contraseña.",
+        "success"
+      ).then(() => {
+        setShowTokenModal(false);
+        setTokenIngresado("");
+        setEmailRecuperar("");
 
-      // Redirigimos con token correcto
-      navigate("/new-password", { state: { email: emailRecuperar, token: tokenTemp } });
-    });
 
-  } catch (err) {
-    Swal.fire("Error", err.message, "error");
-  }
-};
+        navigate("/new-password", { state: { email: emailRecuperar, token: tokenTemp } });
+      });
 
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
+  };
 
 
 
@@ -111,29 +109,64 @@ function Login() {
 
       const data = await res.json();
 
-      // Guarda token, user y rol
+      // Guardar token, rol y código del usuario actual
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", data.user);
       localStorage.setItem("rol", data.rol);
+      localStorage.setItem("codigoUsuario", data.codigo);
 
-      // Redirección según rol
+      // Lee usuarios existentes o crea un objeto vacío
+      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+      const citasExistentes = usuarios[data.codigo]?.citas || [];
+
+      // Crea un objeto user sin sobrescribir citas existentes
+      const user = {
+        codigo: data.codigo ?? "",
+        nombre: data.nombre ?? "",
+        apellido: data.apellido ?? "",
+        dni: data.dni ?? "",
+        sexo: data.sexo ?? "",
+        email: data.email ?? "",
+        telefono: data.telefono ?? "",
+        rol: data.rol,
+        estado: data.estado ?? "Activo",
+        citas: citasExistentes,
+        especialidades: usuarios[data.codigo]?.especialidades || [],
+        turnos: usuarios[data.codigo]?.turnos || [],
+      };
+
+      // Guardar o actualizar usuario
+      usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
       switch (data.rol) {
         case "ROLE_ADMIN":
-          window.location.href = "/dashboard";
+          window.location.href = "/dashboard-admin";
           break;
-        case "ROLE_MEDICO":
-          window.location.href = "/medico-dashboard";
+
+        case "ROLE_MEDICO": {
+          const tienePerfil = (user.especialidades?.length || 0) > 0 && (user.turnos?.length || 0) > 0;
+
+          if (!tienePerfil) {
+            window.location.href = "/crear-perfil-medico";
+          } else {
+            window.location.href = "/index-medico";
+          }
           break;
+        }
+
         case "ROLE_PACIENTE":
-          window.location.href = "/index";
+          window.location.href = "/dashboard-paciente/inicio";
           break;
+
         default:
-          window.location.href = "/index";
+          window.location.href = "/dashboard-paciente/inicio";
           break;
       }
 
+
     } catch (err) {
       setError(err.message);
+      console.error("Error en login:", err);
     }
   };
 
@@ -264,11 +297,6 @@ function Login() {
           </button>
         </Modal.Footer>
       </Modal>
-
-
-
-
-
     </AuthLayout>
   );
 }
