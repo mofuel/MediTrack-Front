@@ -171,8 +171,18 @@ function VistaPacientes() {
                 <button type="button" className="btn-close" onClick={cerrarModal}></button>
               </div>
               <div className="modal-body">
-                <input className="form-control mb-2" placeholder="Nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-                <input className="form-control mb-2" placeholder="DNI" value={formData.dni} onChange={(e) => setFormData({ ...formData, dni: e.target.value })} />
+                <input
+                  className="form-control mb-2"
+                  placeholder="Nombre"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                />
+                <input
+                  className="form-control mb-2"
+                  placeholder="DNI"
+                  value={formData.dni}
+                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
+                />
 
                 {/* Select para Sexo */}
                 <select
@@ -186,14 +196,41 @@ function VistaPacientes() {
                   ))}
                 </select>
 
-                <input className="form-control mb-2" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                <input className="form-control mb-2" placeholder="Teléfono" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
+                <input
+                  className="form-control mb-2"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+                <input
+                  className="form-control mb-2"
+                  placeholder="Teléfono"
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                />
 
-                <select className="form-select" value={formData.estado} onChange={(e) => setFormData({ ...formData, estado: e.target.value })}>
+                {/* Select para Rol */}
+                <select
+                  className="form-select mb-2"
+                  value={formData.rol}
+                  onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
+                >
+                  <option value="ROLE_PACIENTE">Paciente</option>
+                  <option value="ROLE_MEDICO">Médico</option>
+                  <option value="ROLE_ADMIN">Administrador</option>
+                </select>
+
+                {/* Select para Estado */}
+                <select
+                  className="form-select"
+                  value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                >
                   <option value="Activo">Activo</option>
                   <option value="Inactivo">Inactivo</option>
                 </select>
               </div>
+
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={cerrarModal}>Cancelar</button>
                 <button type="submit" className="btn btn-primary">{editarPaciente ? "Guardar" : "Agregar"}</button>

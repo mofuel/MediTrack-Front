@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
-import SelectField from "../../components/SelectField"; 
+import SelectField from "../../components/SelectField";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function VistaDoctores() {
@@ -95,9 +95,14 @@ function VistaDoctores() {
     .filter(d => d.nombre.toLowerCase().includes(busqueda.toLowerCase()))
     .sort((a, b) => orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre));
 
-  const nombreEspecialidades = (ids) => {
-    return ids.map(id => especialidades.find(e => e.id === id)?.nombre).filter(Boolean).join(", ");
+  const nombreEspecialidades = (ids = []) => {
+    if (!Array.isArray(ids)) return "";
+    return ids
+      .map(id => especialidades.find(e => e.id === id)?.nombre)
+      .filter(Boolean)
+      .join(", ");
   };
+
 
   return (
     <div className="container mt-4">

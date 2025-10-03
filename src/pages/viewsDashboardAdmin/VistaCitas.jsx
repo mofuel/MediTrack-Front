@@ -8,41 +8,50 @@ function VistaCitas() {
   const [orden, setOrden] = useState("asc");
   const [citas, setCitas] = useState([]);
 
+  // Usuarios y especialidades desde localStorage
+  const [usuarios, setUsuarios] = useState({});
+  const [especialidades, setEspecialidades] = useState([]);
+  const [medicosFiltrados, setMedicosFiltrados] = useState([]);
+
   // Modal
   const [showModal, setShowModal] = useState(false);
-  const [modalTipo, setModalTipo] = useState("agregar"); // "agregar" o "editar"
+  const [modalTipo, setModalTipo] = useState("agregar");
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
 
-
+  // Formulario
   const [formPaciente, setFormPaciente] = useState("");
+  const [formEspecialidad, setFormEspecialidad] = useState("");
   const [formDoctor, setFormDoctor] = useState("");
   const [formFecha, setFormFecha] = useState("");
   const [formHora, setFormHora] = useState("");
   const [formEstado, setFormEstado] = useState("Pendiente");
 
-  // Cargar citas desde localStorage
+  // Cargar datos iniciales
   useEffect(() => {
-    const cargarCitas = () => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-      const todasCitas = Object.values(usuarios).flatMap(u =>
-        u.citas?.map(c => ({
-          ...c,
-          pacienteCodigo: u.codigo,
-          pacienteNombre: [u.nombre, u.apellido].filter(Boolean).join(" "),
-        })) || []
-      );
-      setCitas(todasCitas);
-    };
+    const dataUsuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    setUsuarios(dataUsuarios);
 
-    cargarCitas();
+    const todasCitas = Object.values(dataUsuarios).flatMap(u =>
+      u.citas?.map(c => ({
+        ...c,
+        pacienteCodigo: u.codigo,
+        pacienteNombre: [u.nombre, u.apellido].filter(Boolean).join(" "),
+      })) || []
+    );
+    setCitas(todasCitas);
+
+    const especialidadesLS = JSON.parse(localStorage.getItem("especialidades")) || [];
+    setEspecialidades(especialidadesLS);
 
     const handleStorageChange = (e) => {
-      if (e.key === "usuarios") cargarCitas();
+      if (e.key === "usuarios") {
+        const data = JSON.parse(e.newValue) || {};
+        setUsuarios(data);
+      }
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-
 
   // Filtrar y ordenar
   const citasFiltradas = citas
@@ -54,7 +63,7 @@ function VistaCitas() {
     );
 
   const getBadgeClass = (estado) => {
-    switch (estado) {
+    switch (estado.toLowerCase()) {
       case "aceptada":
         return "bg-info text-dark";
       case "pendiente":
@@ -66,22 +75,18 @@ function VistaCitas() {
     }
   };
 
-
-  
   const handleAbrirModal = (tipo, cita = null) => {
     setModalTipo(tipo);
     setCitaSeleccionada(cita);
 
     if (tipo === "editar" && cita) {
-      // Traer el paciente real desde localStorage
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
       const paciente = Object.values(usuarios).find(u =>
         u.citas?.some(c => c.id === cita.id)
       );
       const citaReal = paciente?.citas.find(c => c.id === cita.id);
-
       if (citaReal) {
         setFormPaciente([paciente.nombre, paciente.apellido].filter(Boolean).join(" "));
+        setFormEspecialidad(citaReal.especialidad || "");
         setFormDoctor(citaReal.doctor);
         setFormFecha(citaReal.fecha);
         setFormHora(citaReal.hora);
@@ -89,6 +94,7 @@ function VistaCitas() {
       }
     } else {
       setFormPaciente("");
+      setFormEspecialidad("");
       setFormDoctor("");
       setFormFecha("");
       setFormHora("");
@@ -98,21 +104,38 @@ function VistaCitas() {
     setShowModal(true);
   };
 
+  // Manejo de cambio de campos
+  const handleChangeEspecialidad = (e) => {
+    const value = e.target.value;
+    setFormEspecialidad(value);
+
+    if (!value) {
+      setMedicosFiltrados([]);
+      setFormDoctor("");
+      return;
+    }
+
+    const medicos = Object.values(usuarios).filter(
+      u => u.rol === "ROLE_MEDICO" && u.especialidades?.includes(Number(value))
+    );
+    setMedicosFiltrados(medicos);
+    setFormDoctor("");
+  };
 
   // Guardar cita
   const handleGuardarCita = () => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || {};
     let nuevaCita = {
       id: modalTipo === "agregar" ? Date.now() : citaSeleccionada.id,
       doctor: formDoctor,
+      especialidad: Number(formEspecialidad),
       fecha: formFecha,
       hora: formHora,
       estado: formEstado,
     };
 
     if (modalTipo === "agregar") {
-      // Buscar paciente por nombre 
-      const paciente = Object.values(usuarios).find(
+      const paciente = Object.values(usuariosLS).find(
         u => [u.nombre, u.apellido].filter(Boolean).join(" ") === formPaciente
       );
       if (!paciente) {
@@ -122,29 +145,18 @@ function VistaCitas() {
       paciente.citas = paciente.citas || [];
       paciente.citas.push(nuevaCita);
     } else {
-      // Editar cita existente
-      const paciente = Object.values(usuarios).find(u =>
+      const paciente = Object.values(usuariosLS).find(u =>
         u.citas?.some(c => c.id === citaSeleccionada.id)
       );
       if (!paciente) return;
       paciente.citas = paciente.citas.map(c =>
-        c.id === citaSeleccionada.id
-          ? { ...c, doctor: formDoctor, fecha: formFecha, hora: formHora, estado: formEstado }
-          : c
+        c.id === citaSeleccionada.id ? { ...c, ...nuevaCita } : c
       );
     }
 
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-    setShowModal(false);
-    setCitaSeleccionada(null);
-    setFormPaciente("");
-    setFormDoctor("");
-    setFormFecha("");
-    setFormHora("");
-    setFormEstado("Pendiente");
+    localStorage.setItem("usuarios", JSON.stringify(usuariosLS));
 
-    // Actualizar citas
-    const todasCitas = Object.values(usuarios).flatMap(u =>
+    const todasCitas = Object.values(usuariosLS).flatMap(u =>
       u.citas?.map(c => ({
         ...c,
         pacienteCodigo: u.codigo,
@@ -152,17 +164,19 @@ function VistaCitas() {
       })) || []
     );
     setCitas(todasCitas);
+
+    setShowModal(false);
   };
 
   // Eliminar cita
   const handleEliminarCita = (citaId) => {
-    if (!window.confirm("¿Estás seguro de eliminar esta cita?")) return;
+    if (!window.confirm("¿Seguro de eliminar esta cita?")) return;
 
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    Object.values(usuarios).forEach(u => {
+    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || {};
+    Object.values(usuariosLS).forEach(u => {
       u.citas = u.citas?.filter(c => c.id !== citaId) || [];
     });
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    localStorage.setItem("usuarios", JSON.stringify(usuariosLS));
     setCitas(prev => prev.filter(c => c.id !== citaId));
   };
 
@@ -173,6 +187,7 @@ function VistaCitas() {
         <Button text="Agregar Cita" onClick={() => handleAbrirModal("agregar")} />
       </div>
 
+      {/* Búsqueda y orden */}
       <div className="row mb-3">
         <div className="col-md-6">
           <input
@@ -195,11 +210,13 @@ function VistaCitas() {
         </div>
       </div>
 
+      {/* Tabla */}
       <div className="table-responsive">
         <table className="table table-striped table-hover table-bordered align-middle">
           <thead className="table-primary">
             <tr>
               <th>Paciente</th>
+              <th>Especialidad</th>
               <th>Doctor</th>
               <th>Fecha</th>
               <th>Hora</th>
@@ -211,6 +228,7 @@ function VistaCitas() {
             {citasFiltradas.map((cita) => (
               <tr key={cita.id}>
                 <td>{cita.pacienteNombre}</td>
+                <td>{especialidades.find(e => e.id === cita.especialidad)?.nombre}</td>
                 <td>{cita.doctor}</td>
                 <td>{cita.fecha}</td>
                 <td>{cita.hora}</td>
@@ -246,24 +264,59 @@ function VistaCitas() {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {/* Paciente */}
             <Form.Group className="mb-2">
               <Form.Label>Paciente</Form.Label>
-              <Form.Control
-                type="text"
-                value={formPaciente}
-                onChange={(e) => setFormPaciente(e.target.value)}
-                placeholder="Nombre del paciente"
-                disabled={modalTipo === "editar"} // no permitir cambiar paciente al editar
-              />
+              {modalTipo === "agregar" ? (
+                <Form.Select
+                  value={formPaciente}
+                  onChange={(e) => setFormPaciente(e.target.value)}
+                >
+                  <option value="">Seleccione paciente</option>
+                  {Object.values(usuarios)
+                    .filter(u => u.rol === "ROLE_PACIENTE")
+                    .map(p => (
+                      <option key={p.codigo} value={[p.nombre, p.apellido].join(" ")}>
+                        {[p.nombre, p.apellido].join(" ")}
+                      </option>
+                    ))}
+                </Form.Select>
+              ) : (
+                <Form.Control type="text" value={formPaciente} disabled />
+              )}
             </Form.Group>
+
+            {/* Especialidad */}
+            <Form.Group className="mb-2">
+              <Form.Label>Especialidad</Form.Label>
+              <Form.Select
+                value={formEspecialidad}
+                onChange={handleChangeEspecialidad}
+              >
+                <option value="">Seleccione especialidad</option>
+                {especialidades.map(e => (
+                  <option key={e.id} value={e.id}>{e.nombre}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            {/* Doctor */}
             <Form.Group className="mb-2">
               <Form.Label>Doctor</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 value={formDoctor}
                 onChange={(e) => setFormDoctor(e.target.value)}
-              />
+              >
+                <option value="">Seleccione doctor</option>
+                {medicosFiltrados.map(m => (
+                  <option key={m.codigo} value={`${m.nombre} ${m.apellido}`}>
+                    {m.nombre} {m.apellido}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
+
+            {/* Fecha y Hora */}
             <Form.Group className="mb-2">
               <Form.Label>Fecha</Form.Label>
               <Form.Control
@@ -280,6 +333,8 @@ function VistaCitas() {
                 onChange={(e) => setFormHora(e.target.value)}
               />
             </Form.Group>
+
+            {/* Estado */}
             <Form.Group className="mb-2">
               <Form.Label>Estado</Form.Label>
               <Form.Select
@@ -291,7 +346,6 @@ function VistaCitas() {
                 <option>Rechazada</option>
               </Form.Select>
             </Form.Group>
-
           </Form>
         </Modal.Body>
         <Modal.Footer>
