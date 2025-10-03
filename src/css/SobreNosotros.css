@@ -1,0 +1,153 @@
+.sobre-container {
+  padding: 120px 100px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.portada {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.portada-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.portada-text {
+  margin-top: 1rem;
+}
+
+.mision, .vision {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: center;
+}
+
+.mision-text, .vision-text {
+  flex: 1;
+}
+
+.mision-img, .vision-img {
+  width: 350px;
+  border-radius: 8px;
+}
+
+.icon {
+  font-size: 2rem;
+  color: #005288;
+  margin-bottom: 0.5rem;
+}
+
+.valores {
+  text-align: center;
+  margin-top: 4rem;
+}
+
+.valores-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.valor-item {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 250px;
+  text-align: center;
+}
+
+.valor-item .icon {
+  font-size: 2.5rem;
+  color: #0077cc;
+}
+
+@media (max-width: 768px) {
+  .mision, .vision {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .mision-img, .vision-img {
+    max-width: 100%;
+  }
+
+  .valores-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* --- Responsividad para Sobre Nosotros --- */
+@media (max-width: 992px) {
+  .sobre-container {
+    padding: 80px 40px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .mision,
+  .vision {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .mision-img,
+  .vision-img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .valores-grid {
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .sobre-container {
+    padding: 60px 20px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .portada-text p,
+  .mision-text p,
+  .vision-text p,
+  .valor-item p {
+    font-size: 0.95rem;
+  }
+
+  .valor-item {
+    width: 100%;
+    max-width: 300px;
+  }
+}

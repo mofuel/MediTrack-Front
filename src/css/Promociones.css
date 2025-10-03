@@ -1,0 +1,155 @@
+.promociones-container {
+  padding: 120px 100px;
+  background-color: #fff;
+}
+
+.promociones-title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: rgb(0, 45, 97);
+}
+
+.promocion-categoria {
+  margin-bottom: 3rem;
+}
+
+.categoria-titulo {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #001f3d;
+}
+
+.promociones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  
+}
+
+.promocion-card {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+   width: 350px;
+  height: 400px;
+}
+
+.promo-imagen {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.promo-titulo {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.promo-descripcion {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.promo-precio {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #012347;
+}
+
+.promo-boton {
+  background-color: #0056b3;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.promo-boton:hover {
+  background-color: #002c5a;
+}
+
+
+/* --- Responsividad para Promociones --- */
+@media (max-width: 992px) {
+  .promociones-container {
+    padding: 80px 40px;
+  }
+
+  .promociones-title {
+    font-size: 2rem;
+  }
+
+  .categoria-titulo {
+    font-size: 1.3rem;
+  }
+
+  .promocion-card {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .promo-imagen {
+    height: 160px;
+  }
+}
+
+@media (max-width: 576px) {
+  .promociones-container {
+    padding: 60px 20px;
+  }
+
+  .promociones-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .categoria-titulo {
+    font-size: 1.2rem;
+  }
+
+  .promociones-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .promocion-card {
+    width: 100%;
+    height: auto;
+    padding: 15px;
+  }
+
+  .promo-imagen {
+    height: 150px;
+  }
+
+  .promo-titulo {
+    font-size: 1rem;
+  }
+
+  .promo-descripcion,
+  .promo-precio {
+    font-size: 0.9rem;
+  }
+
+  .promo-boton {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,178 @@
+
+/* Contenedor general */
+.especialidad-container {
+padding: 100px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+  color: #001347;
+}
+
+/* Encabezado */
+.especialidad-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.especialidad-header h1 {
+  font-size: 2.5rem;
+  color: #001e46;
+  margin-bottom: 1rem;
+}
+
+.especialidad-header p {
+  font-size: 1.2rem;
+  color: #444;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.atencion-tipos {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.atencion {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  background-color: #e0f7fa;
+  color: #00796b;
+  border: 1px solid #00796b;
+}
+
+.virtual {
+  background-color: #fce4ec;
+  color: #c2185b;
+  border: 1px solid #c2185b;
+}
+
+/* Información general */
+.especialidad-info {
+  
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-left: 5px solid #00395f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.especialidad-info h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #002e4d;
+}
+
+.especialidad-info p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #555;
+}
+
+/* Beneficios */
+.especialidad-beneficios {
+  margin-top: 3rem;
+}
+
+.especialidad-beneficios h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #00365a;
+}
+
+.beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.beneficio-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.beneficio-card:hover {
+  transform: translateY(-5px);
+}
+
+.beneficio-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+  color: #00273f;
+}
+
+.beneficio-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+
+/* --- Responsividad para páginas de especialidad --- */
+@media (max-width: 992px) {
+  .especialidad-container {
+    padding: 80px 20px;
+  }
+
+  .especialidad-header h1 {
+    font-size: 2rem;
+  }
+
+  .especialidad-header p {
+    font-size: 1rem;
+  }
+
+  .atencion-tipos {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .especialidad-info h2,
+  .especialidad-beneficios h2 {
+    font-size: 1.8rem;
+  }
+
+  .beneficios-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .beneficio-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .beneficio-card p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .especialidad-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .especialidad-header p {
+    font-size: 0.95rem;
+  }
+
+  .especialidad-info h2,
+  .especialidad-beneficios h2 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .beneficios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .beneficio-card {
+    padding: 1rem;
+  }
+}

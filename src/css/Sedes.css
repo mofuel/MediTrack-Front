@@ -1,0 +1,120 @@
+.sedes-container {
+  padding: 150px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sedes-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.sedes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sede-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  position: relative;
+  border-left: 8px solid #002147;
+}
+
+.sede-content {
+  flex: 1;
+  padding-left: 1rem;
+}
+
+.sede-nombre {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.sede-direcciones {
+  font-size: 1rem;
+  color: #555;
+}
+
+
+.sede-boton {
+  background-color: #002147;
+  color: #fff;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+
+.sede-boton:hover {
+  background-color: #003366;
+}
+
+/* --- Responsividad para Sedes --- */
+@media (max-width: 992px) {
+  .sedes-container {
+    padding: 120px 40px;
+  }
+
+  .sedes-title {
+    font-size: 2.2rem;
+  }
+
+  .sede-card {
+    padding: 1rem;
+  }
+
+  .sede-nombre {
+    font-size: 1.4rem;
+  }
+
+  .sede-direcciones {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .sedes-container {
+    padding: 100px 20px;
+  }
+
+  .sedes-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sede-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 10px;
+  }
+
+  .sede-content {
+    padding-left: 0;
+  }
+
+  .sede-boton {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+    align-self: flex-end;
+  }
+}

@@ -1,0 +1,337 @@
+
+
+
+.navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Asegúrate que esté por encima del resto */
+  background-color: #ffffff; /* Para que no sea transparente */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Opcional: sombra sutil */
+}
+
+
+
+
+.navbar-container {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 30px; /* Espacio a los lados */
+}
+
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 30px;
+  position: relative;
+}
+
+.navbar-logo {
+  height: 50px;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-item {
+  position: relative;
+  cursor: pointer;
+  font-weight: 500;
+  
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.navbar-phone {
+  font-size: 14px;
+  color: #333;
+}
+
+.navbar-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.navbar-button:hover {
+  background-color: #0056b3;
+}
+
+/* Dropdown corregido */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px 50px;
+  z-index: 1000;
+  width: auto;
+  border-radius: 8px;
+  margin-top: 0px;
+  font-size: 17px;
+}
+
+.dropdown-column {
+  flex: 1;
+  padding: 0 10px;
+}
+
+/* Línea separadora en la primera columna */
+.dropdown-column:first-child {
+  border-right: 1px solid #ccc;
+  padding-right: 20px;
+}
+
+/* Espacio extra en la segunda columna para compensar */
+.dropdown-column:nth-child(2) {
+  padding-left: 20px;
+}
+
+
+.dropdown-item {
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 14px 0;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-item.active {
+  font-weight: bold;
+  color: #007bff;
+}
+
+
+
+
+.dropdown-subitem {
+  display: block;
+  font-size: 17px;
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+
+
+.dropdown-subitem:hover {
+  font-weight: bold;
+  color: #000000;
+  cursor: pointer;
+}
+
+
+.image-column img {
+  width: 420px;
+  height: 420px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 10%;
+  padding: 10px;
+}
+
+
+.dropdown-image-button {
+  display: block;
+  margin: 20px auto 0 auto; /* Espacio arriba del botón */
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-image-button:hover {
+  background-color: #0056b3;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.image-wrapper img {
+  width: 420px;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 10%;
+  display: block;
+}
+
+.image-overlay-button {
+
+  position: absolute;
+  bottom: 20px; /* Puedes ajustar según el diseño */
+  left: 35%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9); /* Azul con transparencia */
+  color: rgb(0, 0, 0);
+  border: none;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 30px;
+  
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  
+}
+
+.image-overlay-button:hover {
+  background-color: rgba(191, 205, 219, 0.9);
+  border-color: #000000;
+}
+
+.menu-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arrow-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.navbar-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.navbar-login:hover {
+  color: #007bff;
+}
+
+.login-icon {
+  font-size: 18px;
+}
+
+
+
+
+#dropdown-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  pointer-events: none; /* Evita que interfiera con el resto del contenido */
+}
+
+
+.home-container {
+  position: relative;
+  z-index: 1; /* Esto está bien, pero asegúrate que no sea mayor que el dropdown */
+}
+
+.fixed-dropdown {
+  position: fixed;
+  top: 86px; /* Ajusta según la altura del navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+
+.navbar-link {
+  color: inherit;
+  text-decoration: none;
+  
+  padding: 0px 0px;
+  display: inline-block;
+ 
+  font-weight: 500;
+}
+
+
+/* Ocultar hamburguesa en escritorio */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+/* Responsivo */
+@media (max-width: 992px) {
+  .hamburger {
+    display: block;
+  }
+
+  .navbar-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #fff;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-top: 1px solid #ddd;
+    padding: 15px 0;
+    z-index: 999;
+  }
+
+  .navbar-menu.active {
+    display: flex;
+  }
+
+  .navbar-item {
+    padding: 10px 20px;
+    text-align: left;
+  }
+
+  .navbar-right {
+    display: none;
+  }
+
+  .dropdown {
+    flex-direction: column;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .image-column {
+    display: none;
+  }
+}

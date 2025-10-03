@@ -1,0 +1,176 @@
+.sede-container {
+  padding: 150px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Encabezado con imagen y texto */
+.sede-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.sede-header-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.sede-header-text h1 {
+  font-size: 2.5rem;
+  color: #002147;
+  margin-bottom: 0.5rem;
+}
+
+.sede-header-text p {
+  font-size: 1rem;
+  color: #333;
+  margin: 0.3rem 0;
+}
+
+.sede-map-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #fff;
+  color: #002147;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.sede-map-btn:hover {
+  background-color: #002147;
+  color: #fff;
+}
+
+.sede-image {
+  flex: 1;
+  min-width: 280px;
+  max-height: 300px;
+  border-radius: 10px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Horarios */
+.sede-horarios {
+  margin-top: 3rem;
+}
+
+.horario-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.horario-card {
+  flex: 1;
+  min-width: 250px;
+  background-color: #f0f4f8;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.horario-card h3 {
+  color: #002147;
+  margin-bottom: 0.5rem;
+}
+
+/* Especialidades */
+.sede-especialidades {
+  margin-top: 3rem;
+}
+
+.especialidades-list {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.especialidades-list li {
+  background-color: #fff;
+  border-left: 6px solid #002147;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* --- Responsividad para la vista de Lima --- */
+@media (max-width: 992px) {
+  .sede-container {
+    padding: 120px 40px;
+  }
+
+  .sede-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sede-header-text h1 {
+    font-size: 2rem;
+  }
+
+  .sede-header-text p {
+    font-size: 0.95rem;
+  }
+
+  .sede-map-btn {
+    width: auto;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .sede-image {
+    max-width: 500px;
+    max-height: 250px;
+  }
+
+  .horario-cards {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .sede-container {
+    padding: 100px 20px;
+  }
+
+  .sede-header-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .sede-map-btn {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .sede-image {
+    width: 100%;
+    max-height: 200px;
+  }
+
+  .especialidades-list {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .especialidades-list li {
+    font-size: 0.95rem;
+    padding: 0.8rem;
+  }
+}
