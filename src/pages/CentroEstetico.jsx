@@ -9,7 +9,7 @@ import equipoImg from '../assets/equipo-estetico.png';
 const CentroEstetico = () => {
   return (
     <>
-      <Navbar />
+      
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -58,7 +58,7 @@ const CentroEstetico = () => {
         </section>
       </div>
 
-      <Footer />
+      
     </>
   );
 };

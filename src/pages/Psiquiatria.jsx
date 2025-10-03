@@ -6,7 +6,6 @@ import '../css/especializacion.css';
 const Psiquiatria = () => {
   return (
     <>
-      <Navbar />
 
       <div className="especialidad-container psiquiatria">
         {/* Encabezado */}
@@ -55,7 +54,6 @@ const Psiquiatria = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

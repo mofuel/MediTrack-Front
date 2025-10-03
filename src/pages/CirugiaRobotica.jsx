@@ -9,7 +9,6 @@ import beneficiosImg from '../assets/beneficios-cirugia-robotica.png';
 const CirugiaRobotica = () => {
   return (
     <>
-      <Navbar />
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -71,7 +70,6 @@ const CirugiaRobotica = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

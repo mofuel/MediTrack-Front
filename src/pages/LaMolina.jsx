@@ -22,7 +22,6 @@ const especialidadesLaMolina = [
 const LaMolina = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sede-container">
         <section className="sede-header">
@@ -61,7 +60,6 @@ const LaMolina = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

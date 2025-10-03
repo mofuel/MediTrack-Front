@@ -34,7 +34,6 @@ const LibroReclamaciones = () => {
 
   return (
     <>
-      <Navbar />
       <div className="libro-container">
         <h1 className="libro-title">Libro de Reclamaciones</h1>
         <p className="libro-subtitle">
@@ -121,7 +120,6 @@ const LibroReclamaciones = () => {
           * La información proporcionada será tratada conforme a la Ley de Protección de Datos Personales.
         </p>
       </div>
-      <Footer />
     </>
   );
 };

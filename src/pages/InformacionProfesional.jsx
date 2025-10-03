@@ -7,7 +7,6 @@ import infoProfesionalHeader from '../assets/info_profesional_header.png';
 const InformacionProfesional = () => {
   return (
     <>
-      <Navbar />
 
       <div className="info-profesional-container">
         {/* Sección introductoria */}
@@ -50,7 +49,6 @@ const InformacionProfesional = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

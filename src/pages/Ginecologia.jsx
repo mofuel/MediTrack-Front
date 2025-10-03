@@ -6,7 +6,6 @@ import '../css/especializacion.css';
 const Ginecologia = () => {
   return (
     <>
-      <Navbar />
 
       <div className="especialidad-container ginecologia">
         {/* Encabezado */}
@@ -61,7 +60,6 @@ const Ginecologia = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

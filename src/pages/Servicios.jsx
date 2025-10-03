@@ -27,7 +27,7 @@ const servicios = [
     titulo: 'Médico Virtual',
     descripcion: 'Consulta médica desde casa con nuestros especialistas.',
     imagen: medicoVirtual,
-    link: '/medico-virtual', // ✅ Ruta directa
+    link: '/medico-virtual', 
     categoria: 'atencion-medica',
   },
   {
@@ -87,7 +87,6 @@ const Servicios = () => {
 
   return (
     <>
-      <Navbar />
       <div className="servicios-container">
         <h2 className="servicios-title">Nuestros servicios clínicos</h2>
 
@@ -114,7 +113,6 @@ const Servicios = () => {
           ))}
         </div>
       </div>
-      <Footer />
     </>
   );
 };

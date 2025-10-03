@@ -16,13 +16,13 @@ import informaciónProfesional from '../../assets/informacion-profesional.png';
 const menuItems = {
   'Para Pacientes': {
     Especialidades: ['Dermatología', 'Gastroenterología', 'Odontología', 'Ginecología', 'Neurología', 'Pediatría', 'Psiquiatría', 'Cardiología'],
-    Servicios: ['Médico Virtual', 'Atención a domicilio', 'Centro Estético', 'Chequeos Médicos', 'Sonrisa Total','Programa de maternidad','Cirugía Robótica'],
+    Servicios: ['Médico Virtual', 'Atención a domicilio', 'Centro Estético', 'Chequeos Médicos', 'Sonrisa Total', 'Programa de maternidad', 'Cirugía Robótica'],
     Promociones: ['Promociones'],
     Sedes: ['San Borja', 'Lima', 'Surco', 'San Isidro', 'La Molina'],
   },
   'Para Médicos': {
     Investigación: ['Investigacion'],
-    Docencia:['Docencia'],
+    Docencia: ['Docencia'],
     'Información para Profesional': ['Información para Profesional'],
   },
 };
@@ -150,14 +150,14 @@ const Navbar = () => {
               activeSubItem === 'Servicios'
                 ? '/servicios'
                 : activeSubItem === 'Especialidades'
-                ? '/especialidades'
-                : activeSubItem === 'Investigación'
-                ? '/investigacion'
-                : activeSubItem === 'Sedes'
-                ? '/sedes'
-                : activeSubItem === 'Promociones'
-                ? '/promociones'
-                : '/especialidades'
+                  ? '/especialidades'
+                  : activeSubItem === 'Investigación'
+                    ? '/investigacion'
+                    : activeSubItem === 'Sedes'
+                      ? '/sedes'
+                      : activeSubItem === 'Promociones'
+                        ? '/promociones'
+                        : '/especialidades'
             }
             className="image-overlay-button"
           >
@@ -212,11 +212,9 @@ const Navbar = () => {
 
             <div className="navbar-right">
               <span className="navbar-phone">📞 01 610 3930</span>
-              <div className="navbar-login">
-                <span className="login-icon">👤</span>
-                <span className="login-text">Ingresar</span>
-              </div>
-              <button className="navbar-button">Agendar cita</button>
+              <Link to="/login" className="navbar-button">
+                Ingresar
+              </Link>
             </div>
           </nav>
         </header>

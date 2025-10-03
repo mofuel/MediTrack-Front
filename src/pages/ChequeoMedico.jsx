@@ -9,7 +9,6 @@ import serviciosImg from '../assets/servicios-chequeo.png';
 const ChequeoMedico = () => {
   return (
     <>
-      <Navbar />
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -65,7 +64,6 @@ const ChequeoMedico = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

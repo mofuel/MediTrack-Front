@@ -22,7 +22,6 @@ const especialidadesLima = [
 const Lima = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sede-container">
         <section className="sede-header">
@@ -67,7 +66,6 @@ const Lima = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

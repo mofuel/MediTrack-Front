@@ -84,7 +84,6 @@ const Especialidades = () => {
 
   return (
     <>
-      <Navbar />
       <main className="especialidades-container">
         <h1 className="especialidades-title">Encuentra la especialidad que necesitas</h1>
 
@@ -121,7 +120,6 @@ const Especialidades = () => {
           ))}
         </div>
       </main>
-      <Footer />
     </>
   );
 };

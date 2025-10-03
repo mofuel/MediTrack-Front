@@ -9,14 +9,13 @@ import agendamientoImg from '../assets/agendamiento-sonrisa.png';
 const SonrisaTotal = () => {
   return (
     <>
-      <Navbar />
 
       <div className="servicio-container">
         <section className="servicio-header">
           <div className="servicio-text">
             <h1>Cuida tu salud bucal con los mejores especialistas</h1>
             <p>El servicio de Sonrisa Total está diseñado para ofrecer atención integral y especializada en salud bucal. Desde diagnóstico y tratamientos hasta la prevención y recuperación, brindamos un servicio completo para que disfrutes de una sonrisa saludable.</p>
-            
+
           </div>
           <div className="servicio-image">
             <img src={sonrisaImg} alt="Sonrisa Total" />
@@ -61,7 +60,6 @@ const SonrisaTotal = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

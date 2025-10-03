@@ -9,7 +9,6 @@ import serviciosImg from '../assets/servicios-maternidad.png';
 const ProgramaMaternidad = () => {
   return (
     <>
-      <Navbar />
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -64,7 +63,6 @@ const ProgramaMaternidad = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

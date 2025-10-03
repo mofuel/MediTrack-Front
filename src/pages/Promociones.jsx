@@ -104,7 +104,6 @@ const promociones = [
 const Promociones = () => {
   return (
     <>
-      <Navbar />
       <div className="promociones-container">
         <h2 className="promociones-title">Promociones y Ofertas</h2>
 
@@ -125,7 +124,6 @@ const Promociones = () => {
           </div>
         ))}
       </div>
-      <Footer />
     </>
   );
 };

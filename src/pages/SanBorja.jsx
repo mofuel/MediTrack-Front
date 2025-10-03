@@ -22,18 +22,17 @@ const especialidadesSanBorja = [
 const SanBorja = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sede-container">
         <section className="sede-header">
-  <div className="sede-header-text">
-    <h1>Sede San Borja</h1>
-    <p>Av. Guardia Civil 385 - 433</p>
-    <p>Central telefónica: (01) 610-3333</p>
-    <Link to="https://www.google.com/maps" target="_blank" className="sede-map-btn">¿Cómo llegar?</Link>
-  </div>
-  <img src={sanborjaImg} alt="Sede San Borja" className="sede-image" />
-</section>
+          <div className="sede-header-text">
+            <h1>Sede San Borja</h1>
+            <p>Av. Guardia Civil 385 - 433</p>
+            <p>Central telefónica: (01) 610-3333</p>
+            <Link to="https://www.google.com/maps" target="_blank" className="sede-map-btn">¿Cómo llegar?</Link>
+          </div>
+          <img src={sanborjaImg} alt="Sede San Borja" className="sede-image" />
+        </section>
 
         <section className="sede-horarios">
           <h2>Conoce nuestros horarios de atención</h2>
@@ -67,7 +66,6 @@ const SanBorja = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

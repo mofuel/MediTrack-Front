@@ -67,6 +67,7 @@
   padding: 8px 14px;
   border-radius: 50px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .navbar-button:hover {

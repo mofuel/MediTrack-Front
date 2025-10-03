@@ -9,7 +9,6 @@ import reservaImg from '../assets/reserva-medico-virtual.png';
 const MedicoVirtual = () => {
   return (
     <>
-      <Navbar />
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -61,7 +60,6 @@ const MedicoVirtual = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

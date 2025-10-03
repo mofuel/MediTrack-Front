@@ -10,7 +10,6 @@ import { FaBullseye, FaEye, FaHandshake } from 'react-icons/fa';
 const SobreNosotros = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sobre-container">
         {/* Portada */}
@@ -71,7 +70,6 @@ const SobreNosotros = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

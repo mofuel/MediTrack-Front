@@ -22,7 +22,6 @@ const especialidadesSanIsidro = [
 const SanIsidro = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sede-container">
         <section className="sede-header">
@@ -63,7 +62,6 @@ const SanIsidro = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

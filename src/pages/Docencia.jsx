@@ -8,7 +8,6 @@ import formacionProfesional from '../assets/formacion_profesional.png';
 const Docencia = () => {
   return (
     <>
-      <Navbar />
 
       <div className="docencia-container">
         {/* Sección introductoria */}
@@ -73,7 +72,6 @@ const Docencia = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

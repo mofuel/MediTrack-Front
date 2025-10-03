@@ -9,7 +9,6 @@ import investigacionLaboratorio from '../assets/investigacion_laboratorio.png';
 const Investigacion = () => {
   return (
     <>
-      <Navbar />
 
       <div className="investigacion-container">
         <section className="intro">
@@ -57,7 +56,6 @@ const Investigacion = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

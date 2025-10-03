@@ -28,7 +28,6 @@ const Home = () => {
      const [activeSede, setActiveSede] = useState(null);
   return (
     <>
-      <Navbar />
 
       <main className="home-container">
         {/* Encabezado */}
@@ -40,7 +39,7 @@ const Home = () => {
         
       {/* Menú de acciones rápidas */}
       <section className="quick-actions">
-        <Link to="/cita" className="action-button">
+        <Link to="/login" className="action-button">
           <div className="action-icon"><FaCalendarCheck /></div>
           <div className="action-text">Agendar una cita</div>
         </Link>
@@ -195,7 +194,6 @@ const Home = () => {
         </section>
                 
       </main>
-      <Footer />
     </>
   );
 };

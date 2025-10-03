@@ -248,7 +248,7 @@ function RegistroForm() {
 
                 <section className="col-12 text-center mt-3">
                     <Button text="Registrarse" type="submit" />
-                    <p>¿Ya tienes una cuenta? <ActionLink text="Inicia Sesión" href="/" /></p>
+                    <p>¿Ya tienes una cuenta? <ActionLink text="Inicia Sesión" href="/login" /></p>
                 </section>
             </form>
 

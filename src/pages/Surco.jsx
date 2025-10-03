@@ -22,7 +22,6 @@ const especialidadesSurco = [
 const Surco = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sede-container">
         <section className="sede-header">
@@ -63,7 +62,6 @@ const Surco = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

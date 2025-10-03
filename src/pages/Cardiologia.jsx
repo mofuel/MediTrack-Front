@@ -6,7 +6,7 @@ import '../css/especializacion.css';
 const Cardiologia = () => {
   return (
     <>
-      <Navbar />
+      
 
       <div className="especialidad-container cardiologia">
         {/* Encabezado */}
@@ -67,7 +67,7 @@ const Cardiologia = () => {
         </section>
       </div>
 
-      <Footer />
+
     </>
   );
 };

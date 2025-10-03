@@ -38,7 +38,6 @@ const sedes = [
 const Sedes = () => {
   return (
     <>
-      <Navbar />
 
       <div className="sedes-container">
         <h1 className="sedes-title">Sedes</h1>
@@ -61,7 +60,6 @@ const Sedes = () => {
         </section>
       </div>
 
-      <Footer />
     </>
   );
 };

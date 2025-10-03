@@ -10,7 +10,7 @@ import reservaImg from '../assets/reserva-cita.png';
 const AtencionADomicilio = () => {
   return (
     <>
-      <Navbar />
+      
 
       <div className="servicio-container">
         <section className="servicio-header">
@@ -62,7 +62,7 @@ const AtencionADomicilio = () => {
         </section>
       </div>
 
-      <Footer />
+      
     </>
   );
 };

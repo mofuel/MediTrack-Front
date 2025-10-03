@@ -1,7 +1,11 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 
-// Rutas del sistema de usuarios
+// Layouts
+import LayoutInstitucional from "./layouts/LayoutInstitucional";
+import LayoutSistema from "./layouts/LayoutSistema";
+
+// Rutas del sistema
 import Login from "./pages/Login";
 import Registro from "./pages/Register";
 import NewPassword from "./pages/NewPassword";
@@ -46,65 +50,60 @@ import InformacionProfesional from "./pages/InformacionProfesional";
 import SobreNosotros from "./pages/SobreNosotros";
 import LibroReclamaciones from "./pages/LibroReclamaciones";
 
-// Componentes globales
-import ScrollToTop from "./components/ScrollToTop";
-import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
-
 function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Navbar />
-
       <Routes>
-        {/* Rutas institucionales */}
-        <Route path="/" element={<Home />} />
-        <Route path="/servicios" element={<Servicios />} />
-        <Route path="/especialidades" element={<Especialidades />} />
-        <Route path="/dermatologia" element={<Dermatologia />} />
-        <Route path="/gastroenterologia" element={<Gastroenterologia />} />
-        <Route path="/odontologia" element={<Odontologia />} />
-        <Route path="/ginecologia" element={<Ginecologia />} />
-        <Route path="/neurologia" element={<Neurologia />} />
-        <Route path="/pediatria" element={<Pediatria />} />
-        <Route path="/psiquiatria" element={<Psiquiatria />} />
-        <Route path="/cardiologia" element={<Cardiologia />} />
-        <Route path="/atencion-domicilio" element={<AtencionADomicilio />} />
-        <Route path="/medico-virtual" element={<MedicoVirtual />} />
-        <Route path="/centro-estetico" element={<CentroEstetico />} />
-        <Route path="/chequeos-medicos" element={<ChequeoMedico />} />
-        <Route path="/sonrisa-total" element={<SonrisaTotal />} />
-        <Route path="/programa-maternidad" element={<ProgramaMaternidad />} />
-        <Route path="/cirugia-robotica" element={<CirugiaRobotica />} />
-        <Route path="/promociones" element={<Promociones />} />
-        <Route path="/sedes" element={<Sedes />} />
-        <Route path="/sede-san-borja" element={<SanBorja />} />
-        <Route path="/sede-lima" element={<Lima />} />
-        <Route path="/sede-surco" element={<Surco />} />
-        <Route path="/sede-san-isidro" element={<SanIsidro />} />
-        <Route path="/sede-la-molina" element={<LaMolina />} />
-        <Route path="/investigacion" element={<Investigacion />} />
-        <Route path="/docencia" element={<Docencia />} />
-        <Route path="/informacion-profesional" element={<InformacionProfesional />} />
-        <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-        <Route path="/libro-reclamaciones" element={<LibroReclamaciones />} />
+        {/* Layout con Navbar y Footer */}
+        <Route element={<LayoutInstitucional />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/servicios" element={<Servicios />} />
+          <Route path="/especialidades" element={<Especialidades />} />
+          <Route path="/dermatologia" element={<Dermatologia />} />
+          <Route path="/gastroenterologia" element={<Gastroenterologia />} />
+          <Route path="/odontologia" element={<Odontologia />} />
+          <Route path="/ginecologia" element={<Ginecologia />} />
+          <Route path="/neurologia" element={<Neurologia />} />
+          <Route path="/pediatria" element={<Pediatria />} />
+          <Route path="/psiquiatria" element={<Psiquiatria />} />
+          <Route path="/cardiologia" element={<Cardiologia />} />
+          <Route path="/atencion-domicilio" element={<AtencionADomicilio />} />
+          <Route path="/medico-virtual" element={<MedicoVirtual />} />
+          <Route path="/centro-estetico" element={<CentroEstetico />} />
+          <Route path="/chequeos-medicos" element={<ChequeoMedico />} />
+          <Route path="/sonrisa-total" element={<SonrisaTotal />} />
+          <Route path="/programa-maternidad" element={<ProgramaMaternidad />} />
+          <Route path="/cirugia-robotica" element={<CirugiaRobotica />} />
+          <Route path="/promociones" element={<Promociones />} />
+          <Route path="/sedes" element={<Sedes />} />
+          <Route path="/sede-san-borja" element={<SanBorja />} />
+          <Route path="/sede-lima" element={<Lima />} />
+          <Route path="/sede-surco" element={<Surco />} />
+          <Route path="/sede-san-isidro" element={<SanIsidro />} />
+          <Route path="/sede-la-molina" element={<LaMolina />} />
+          <Route path="/investigacion" element={<Investigacion />} />
+          <Route path="/docencia" element={<Docencia />} />
+          <Route path="/informacion-profesional" element={<InformacionProfesional />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+          <Route path="/libro-reclamaciones" element={<LibroReclamaciones />} />
+        </Route>
 
-        {/* Rutas del sistema */}
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/new-password" element={<NewPassword />} />
-        <Route path="/crear-perfil-medico" element={<CrearPerfilMedico />} />
-        <Route path="/index-medico" element={<IndexMedico />} />
-        <Route path="/solicitudes-citas" element={<SolicitudesCitas />} />
-        <Route path="/historial-citas" element={<HistorialCitas />} />
-        <Route path="/notificaciones" element={<Notificaciones />} />
-        <Route path="/perfil-medico" element={<PerfilMedico />} />
-        <Route path="/dashboard-admin/*" element={<DashboardAdmin />} />
-        <Route path="/dashboard-paciente/*" element={<DashboardPaciente />} />
-        <Route path="/login" element={<Login />} />
+        {/* Layout sin Navbar ni Footer */}
+        <Route element={<LayoutSistema />}>
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/new-password" element={<NewPassword />} />
+          <Route path="/crear-perfil-medico" element={<CrearPerfilMedico />} />
+          <Route path="/index-medico" element={<IndexMedico />} />
+          <Route path="/solicitudes-citas" element={<SolicitudesCitas />} />
+          <Route path="/historial-citas" element={<HistorialCitas />} />
+          <Route path="/notificaciones" element={<Notificaciones />} />
+          <Route path="/perfil-medico" element={<PerfilMedico />} />
+          <Route path="/dashboard-admin/*" element={<DashboardAdmin />} />
+          <Route path="/dashboard-paciente/*" element={<DashboardPaciente />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
       </Routes>
-
-      <Footer />
     </Router>
   );
 }
