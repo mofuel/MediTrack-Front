@@ -26,11 +26,32 @@ function VistaPacientes() {
   ];
 
   // Cargar pacientes desde localStorage
-  useEffect(() => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const pacientesRol = Object.values(usuarios).filter(u => u.rol === "ROLE_PACIENTE");
-    setPacientes(pacientesRol);
-  }, []);
+  // Cargar pacientes desde la API
+useEffect(() => {
+  const fetchPacientes = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8080/api/users", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al obtener los usuarios");
+      }
+
+      const data = await response.json();
+      const pacientesRol = data.filter(u => u.rol === "ROLE_PACIENTE");
+      setPacientes(pacientesRol);
+    } catch (error) {
+      console.error("❌ Error al cargar pacientes:", error);
+    }
+  };
+
+  fetchPacientes();
+}, []);
+
 
   // Guardar pacientes en localStorage
   const guardarPacientes = (updated) => {
