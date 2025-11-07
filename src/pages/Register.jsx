@@ -9,12 +9,8 @@ import SelectField from "../components/SelectField";
 import AuthLayout from "../layouts/AuthLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faPhone, faIdCard, faVenusMars } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
-
 
 function RegistroForm() {
-    const navigate = useNavigate();
-
     const [form, setForm] = useState({
         nombre: "",
         apellido: "",
@@ -33,7 +29,7 @@ function RegistroForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validar campos obligatorios
+        // 🔸 Validar campos obligatorios
         const camposVacios = Object.entries(form)
             .filter(([, valor]) => !valor)
             .map(([nombre]) => nombre);
@@ -47,7 +43,7 @@ function RegistroForm() {
             return;
         }
 
-        // Validar contraseñas
+        // 🔸 Validar contraseñas
         if (form.password !== form.confirmPassword) {
             Swal.fire({
                 icon: 'error',
@@ -64,35 +60,85 @@ function RegistroForm() {
                 body: JSON.stringify(form)
             });
 
-            const text = await resp.text();
-
             if (!resp.ok) {
+                const text = await resp.text();
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: text
                 });
-            } else {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Registro exitoso',
-                    text: text
-                }).then(() => {
-                    navigate("/");
-                });
-
-                // Limpiar formulario
-                setForm({
-                    nombre: "",
-                    apellido: "",
-                    dni: "",
-                    telefono: "",
-                    email: "",
-                    sexo: "",
-                    password: "",
-                    confirmPassword: ""
-                });
+                return;
             }
+
+            const data = await resp.json();
+
+            // ✅ Guardar token, rol y código del usuario actual
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("rol", data.rol);
+            localStorage.setItem("codigoUsuario", data.codigo);
+
+            // ✅ Leer o crear estructura de usuarios
+            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+            const citasExistentes = usuarios[data.codigo]?.citas || [];
+
+            const user = {
+                codigo: data.codigo ?? "",
+                nombre: data.nombre ?? "",
+                apellido: data.apellido ?? "",
+                dni: data.dni ?? "",
+                sexo: data.sexo ?? "",
+                email: data.email ?? "",
+                telefono: data.telefono ?? "",
+                rol: data.rol,
+                estado: data.estado ?? "Activo",
+                citas: citasExistentes,
+                especialidades: usuarios[data.codigo]?.especialidades || [],
+                turnos: usuarios[data.codigo]?.turnos || [],
+            };
+
+            usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
+            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+            // ✅ Mostrar confirmación y redirigir según el rol
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: 'Tu cuenta ha sido creada correctamente',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                switch (data.rol) {
+                    case "ROLE_ADMIN":
+                        window.location.href = "/dashboard-admin";
+                        break;
+                    case "ROLE_MEDICO": {
+                        const tienePerfil = (user.especialidades?.length || 0) > 0 && (user.turnos?.length || 0) > 0;
+                        if (!tienePerfil) {
+                            window.location.href = "/crear-perfil-medico";
+                        } else {
+                            window.location.href = "/index-medico";
+                        }
+                        break;
+                    }
+                    case "ROLE_PACIENTE":
+                    default:
+                        window.location.href = "/dashboard-paciente/inicio";
+                        break;
+                }
+            });
+
+            // ✅ Limpiar formulario
+            setForm({
+                nombre: "",
+                apellido: "",
+                dni: "",
+                telefono: "",
+                email: "",
+                sexo: "",
+                password: "",
+                confirmPassword: ""
+            });
+
         } catch (err) {
             console.error(err);
             Swal.fire({
@@ -103,9 +149,6 @@ function RegistroForm() {
         }
     };
 
-
-
-
     return (
         <AuthLayout>
             <form className="login-box registro-form" onSubmit={handleSubmit}>
@@ -114,14 +157,11 @@ function RegistroForm() {
                 </section>
 
                 <section className="form-columns">
-
                     {/* Columna izquierda */}
                     <article className="column">
                         {/* Nombre */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faUser} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faUser} /></span>
                             <InputField
                                 type="text"
                                 id="nombre"
@@ -133,9 +173,7 @@ function RegistroForm() {
 
                         {/* Apellido */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faUser} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faUser} /></span>
                             <InputField
                                 type="text"
                                 id="apellido"
@@ -147,9 +185,7 @@ function RegistroForm() {
 
                         {/* DNI */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faIdCard} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faIdCard} /></span>
                             <InputField
                                 type="text"
                                 id="dni"
@@ -161,9 +197,7 @@ function RegistroForm() {
 
                         {/* Teléfono */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faPhone} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faPhone} /></span>
                             <InputField
                                 type="text"
                                 id="telefono"
@@ -172,20 +206,13 @@ function RegistroForm() {
                                 onChange={handleChange}
                             />
                         </section>
-
-
-
                     </article>
 
                     {/* Columna derecha */}
                     <article className="column">
-
-
                         {/* Email */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faEnvelope} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faEnvelope} /></span>
                             <InputField
                                 type="email"
                                 id="email"
@@ -197,9 +224,7 @@ function RegistroForm() {
 
                         {/* Sexo */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faVenusMars} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faVenusMars} /></span>
                             <SelectField
                                 id="sexo"
                                 value={form.sexo}
@@ -211,13 +236,9 @@ function RegistroForm() {
                             />
                         </section>
 
-
-
                         {/* Contraseña */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faLock} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faLock} /></span>
                             <InputField
                                 type="password"
                                 id="password"
@@ -229,9 +250,7 @@ function RegistroForm() {
 
                         {/* Confirmar Password */}
                         <section className="mb-3 input-group">
-                            <span className="input-group-text">
-                                <FontAwesomeIcon icon={faLock} />
-                            </span>
+                            <span className="input-group-text"><FontAwesomeIcon icon={faLock} /></span>
                             <InputField
                                 type="password"
                                 id="confirmPassword"
@@ -240,10 +259,7 @@ function RegistroForm() {
                                 onChange={handleChange}
                             />
                         </section>
-
-
                     </article>
-
                 </section>
 
                 <section className="col-12 text-center mt-3">
@@ -251,10 +267,8 @@ function RegistroForm() {
                     <p>¿Ya tienes una cuenta? <ActionLink text="Inicia Sesión" href="/login" /></p>
                 </section>
             </form>
-
         </AuthLayout>
     );
-
 }
 
 export default RegistroForm;
