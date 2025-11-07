@@ -27,30 +27,30 @@ function VistaPacientes() {
 
   // Cargar pacientes desde localStorage
   // Cargar pacientes desde la API
-useEffect(() => {
-  const fetchPacientes = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/api/users", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+  useEffect(() => {
+    const fetchPacientes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8080/api/users", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error("Error al obtener los usuarios");
+        if (!response.ok) {
+          throw new Error("Error al obtener los usuarios");
+        }
+
+        const data = await response.json();
+        const pacientesRol = data.filter(u => u.rol === "ROLE_PACIENTE");
+        setPacientes(pacientesRol);
+      } catch (error) {
+        console.error("❌ Error al cargar pacientes:", error);
       }
+    };
 
-      const data = await response.json();
-      const pacientesRol = data.filter(u => u.rol === "ROLE_PACIENTE");
-      setPacientes(pacientesRol);
-    } catch (error) {
-      console.error("❌ Error al cargar pacientes:", error);
-    }
-  };
-
-  fetchPacientes();
-}, []);
+    fetchPacientes();
+  }, []);
 
 
   // Guardar pacientes en localStorage
@@ -111,6 +111,21 @@ useEffect(() => {
     .filter(p => p.nombre.toLowerCase().includes(busqueda.toLowerCase()))
     .sort((a, b) => orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre));
 
+
+  const obtenerNombreRol = (rol) => {
+    switch (rol) {
+      case "ROLE_PACIENTE":
+        return "Paciente";
+      case "ROLE_MEDICO":
+        return "Médico";
+      case "ROLE_ADMIN":
+        return "Administrador";
+      default:
+        return rol;
+    }
+  };
+
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -165,10 +180,11 @@ useEffect(() => {
                   <td>{p.sexo}</td>
                   <td>{p.email}</td>
                   <td>{p.telefono}</td>
-                  <td>{p.rol}</td>
+                  <td>{obtenerNombreRol(p.rol)}</td>
+
                   <td>
-                    <span className={`badge ${p.estado === "Activo" ? "bg-success" : "bg-secondary"}`}>
-                      {p.estado}
+                    <span className={`badge ${(p.estado === "Activo" || p.activo) ? "bg-success" : "bg-secondary"}`}>
+                      {p.estado || (p.activo ? "Activo" : "Inactivo")}
                     </span>
                   </td>
                   <td>
