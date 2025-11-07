@@ -6,12 +6,11 @@ function VistaPacientes() {
   const [pacientes, setPacientes] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [orden, setOrden] = useState("asc");
-
-
   const [showModal, setShowModal] = useState(false);
   const [editarPaciente, setEditarPaciente] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
+    apellido: "",
     dni: "",
     sexo: "",
     email: "",
@@ -20,26 +19,19 @@ function VistaPacientes() {
     estado: "Activo",
   });
 
-  const opcionesSexo = [
-    { value: "MASCULINO", label: "Masculino" },
-    { value: "FEMENINO", label: "Femenino" },
-  ];
+  const token = localStorage.getItem("token");
 
-  // Cargar pacientes desde localStorage
-  // Cargar pacientes desde la API
+  // ✅ Cargar pacientes desde la API
   useEffect(() => {
     const fetchPacientes = async () => {
       try {
-        const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:8080/api/users", {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los usuarios");
-        }
+        if (!response.ok) throw new Error("Error al obtener los usuarios");
 
         const data = await response.json();
         const pacientesRol = data.filter(u => u.rol === "ROLE_PACIENTE");
@@ -50,27 +42,21 @@ function VistaPacientes() {
     };
 
     fetchPacientes();
-  }, []);
+  }, [token]);
 
-
-  // Guardar pacientes en localStorage
-  const guardarPacientes = (updated) => {
-    setPacientes(updated);
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    updated.forEach(p => {
-      usuarios[p.codigo] = p;
-    });
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-  };
-
+  // ✅ Abrir modal (editar o nuevo)
   const abrirModal = (paciente = null) => {
     if (paciente) {
       setEditarPaciente(paciente.codigo);
-      setFormData({ ...paciente });
+      setFormData({
+        ...paciente,
+        estado: paciente.activo ? "Activo" : "Inactivo",
+      });
     } else {
       setEditarPaciente(null);
       setFormData({
         nombre: "",
+        apellido: "",
         dni: "",
         sexo: "",
         email: "",
@@ -84,33 +70,92 @@ function VistaPacientes() {
 
   const cerrarModal = () => setShowModal(false);
 
-  const handleSubmit = (e) => {
+  // ✅ Guardar cambios (nuevo o edición)
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, dni, sexo, email, telefono } = formData;
-    if (!nombre || !dni || !sexo || !email || !telefono) return alert("Todos los campos son obligatorios");
+    if (!nombre || !dni || !sexo || !email || !telefono)
+      return alert("Todos los campos son obligatorios");
 
-    if (editarPaciente) {
-      const updated = pacientes.map(p =>
-        p.codigo === editarPaciente ? { ...p, ...formData } : p
-      );
-      guardarPacientes(updated);
-    } else {
-      const nuevo = { ...formData, codigo: Date.now().toString() };
-      guardarPacientes([...pacientes, nuevo]);
+    try {
+      const payload = {
+        ...formData,
+        activo: formData.estado === "Activo",
+      };
+
+      let response;
+      if (editarPaciente) {
+        // 🔄 Actualizar
+        response = await fetch(`http://localhost:8080/api/users/${editarPaciente}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // ➕ Registrar nuevo
+        response = await fetch("http://localhost:8080/api/users/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nombre: formData.nombre,
+            apellido: formData.apellido,
+            dni: formData.dni,
+            sexo: formData.sexo,
+            email: formData.email,
+            telefono: formData.telefono,
+            password: "123456", // puedes cambiar esto si deseas otro campo
+            confirmPassword: "123456",
+          }),
+        });
+      }
+
+      if (!response.ok) throw new Error("Error al guardar el usuario");
+
+      // 🔄 Refrescar lista
+      const updatedList = await fetch("http://localhost:8080/api/users", {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const newData = await updatedList.json();
+      setPacientes(newData.filter(u => u.rol === "ROLE_PACIENTE"));
+
+      cerrarModal();
+    } catch (error) {
+      console.error("❌ Error al guardar paciente:", error);
+      alert("Error al guardar el paciente");
     }
-    cerrarModal();
   };
 
-  const handleEliminar = (codigo) => {
-    if (window.confirm("¿Eliminar paciente? Esta acción no se puede deshacer")) {
-      guardarPacientes(pacientes.filter(p => p.codigo !== codigo));
+  // 🗑️ Eliminar
+  const handleEliminar = async (codigo) => {
+    if (!window.confirm("¿Eliminar paciente?")) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/users/${codigo}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Error al eliminar paciente");
+
+      setPacientes(pacientes.filter(p => p.codigo !== codigo));
+    } catch (error) {
+      console.error("❌ Error al eliminar paciente:", error);
     }
   };
 
+  // 🔍 Filtro + orden
   const pacientesFiltrados = pacientes
-    .filter(p => p.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-    .sort((a, b) => orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre));
-
+    .filter(p => p.nombre?.toLowerCase().includes(busqueda.toLowerCase()))
+    .sort((a, b) =>
+      orden === "asc"
+        ? a.nombre.localeCompare(b.nombre)
+        : b.nombre.localeCompare(a.nombre)
+    );
 
   const obtenerNombreRol = (rol) => {
     switch (rol) {
@@ -125,7 +170,7 @@ function VistaPacientes() {
     }
   };
 
-
+  // ✅ Render
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -181,10 +226,9 @@ function VistaPacientes() {
                   <td>{p.email}</td>
                   <td>{p.telefono}</td>
                   <td>{obtenerNombreRol(p.rol)}</td>
-
                   <td>
-                    <span className={`badge ${(p.estado === "Activo" || p.activo) ? "bg-success" : "bg-secondary"}`}>
-                      {p.estado || (p.activo ? "Activo" : "Inactivo")}
+                    <span className={`badge ${p.activo ? "bg-success" : "bg-secondary"}`}>
+                      {p.activo ? "Activo" : "Inactivo"}
                     </span>
                   </td>
                   <td>
@@ -208,66 +252,34 @@ function VistaPacientes() {
                 <button type="button" className="btn-close" onClick={cerrarModal}></button>
               </div>
               <div className="modal-body">
-                <input
-                  className="form-control mb-2"
-                  placeholder="Nombre"
-                  value={formData.nombre}
-                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="DNI"
-                  value={formData.dni}
-                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
-                />
-
-                {/* Select para Sexo */}
-                <select
-                  className="form-select mb-2"
-                  value={formData.sexo}
-                  onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
-                >
+                <input className="form-control mb-2" placeholder="Nombre"
+                  value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
+                <input className="form-control mb-2" placeholder="Apellido"
+                  value={formData.apellido} onChange={(e) => setFormData({ ...formData, apellido: e.target.value })} />
+                <input className="form-control mb-2" placeholder="DNI"
+                  value={formData.dni} onChange={(e) => setFormData({ ...formData, dni: e.target.value })} />
+                <select className="form-select mb-2" value={formData.sexo}
+                  onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}>
                   <option value="">Seleccione Sexo</option>
-                  {opcionesSexo.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="FEMENINO">Femenino</option>
                 </select>
-
-                <input
-                  className="form-control mb-2"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Teléfono"
-                  value={formData.telefono}
-                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                />
-
-                {/* Select para Rol */}
-                <select
-                  className="form-select mb-2"
-                  value={formData.rol}
-                  onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
-                >
+                <input className="form-control mb-2" placeholder="Email"
+                  value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                <input className="form-control mb-2" placeholder="Teléfono"
+                  value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
+                <select className="form-select mb-2" value={formData.rol}
+                  onChange={(e) => setFormData({ ...formData, rol: e.target.value })}>
                   <option value="ROLE_PACIENTE">Paciente</option>
                   <option value="ROLE_MEDICO">Médico</option>
                   <option value="ROLE_ADMIN">Administrador</option>
                 </select>
-
-                {/* Select para Estado */}
-                <select
-                  className="form-select"
-                  value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                >
+                <select className="form-select" value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}>
                   <option value="Activo">Activo</option>
                   <option value="Inactivo">Inactivo</option>
                 </select>
               </div>
-
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={cerrarModal}>Cancelar</button>
                 <button type="submit" className="btn btn-primary">{editarPaciente ? "Guardar" : "Agregar"}</button>
