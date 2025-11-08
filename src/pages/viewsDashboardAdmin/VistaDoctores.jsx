@@ -13,6 +13,7 @@ function VistaDoctores() {
   const [editarDoctor, setEditarDoctor] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
+    apellido: "",
     dni: "",
     sexo: "",
     email: "",
@@ -28,62 +29,56 @@ function VistaDoctores() {
     { value: "FEMENINO", label: "Femenino" },
   ];
 
-  // 🔹 Cargar doctores y especialidades desde la API
+  const token = localStorage.getItem("token");
+
+  // 🔹 Cargar doctores y especialidades
   useEffect(() => {
     cargarDoctores();
     cargarEspecialidades();
   }, []);
 
   const cargarDoctores = async () => {
-  try {
-    const token = localStorage.getItem("token"); // Obtén tu JWT guardado
-    const response = await fetch(`${API_BASE_URL}/users`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al cargar doctores");
+      const data = await response.json();
+      setDoctores(data.filter(u => u.rol === "ROLE_MEDICO"));
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const data = await response.json();
-    setDoctores(data.filter(u => u.rol === "ROLE_MEDICO"));
-  } catch (error) {
-    console.error("Error al cargar doctores:", error);
-  }
-};
-
-const cargarEspecialidades = async () => {
-  try {
-    const token = localStorage.getItem("token"); // Obtén tu JWT guardado
-    const response = await fetch(`${API_BASE_URL}/specialties`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  const cargarEspecialidades = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/specialties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al cargar especialidades");
+      const data = await response.json();
+      setEspecialidades(data);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const data = await response.json();
-    setEspecialidades(data);
-  } catch (error) {
-    console.error("Error al cargar especialidades:", error);
-  }
-};
-
+  // 🔹 Abrir modal
   const abrirModal = (doctor = null) => {
     if (doctor) {
       setEditarDoctor(doctor.codigo);
-      setFormData({ ...doctor, password: "", confirmPassword: "" });
+      setFormData({
+        ...doctor,
+        password: "",
+        confirmPassword: "",
+        apellido: doctor.apellido || "",
+        especialidades: doctor.especialidades ? doctor.especialidades.map(e => e.id) : [],
+      });
     } else {
       setEditarDoctor(null);
       setFormData({
         nombre: "",
+        apellido: "",
         dni: "",
         sexo: "",
         email: "",
@@ -102,36 +97,33 @@ const cargarEspecialidades = async () => {
   // 🔹 Guardar o editar doctor
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { nombre, apellido, dni, sexo, email, telefono, password, confirmPassword } = formData;
 
-    const { nombre, dni, sexo, email, telefono, password, confirmPassword } = formData;
-
-    if (!nombre || !dni || !sexo || !email || !telefono) {
+    if (!nombre || !apellido || !dni || !sexo || !email || !telefono) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
     try {
+      const payload = {
+        ...formData,
+        rol: "ROLE_MEDICO",
+        especialidades: formData.especialidades,
+      };
+
       let response;
       if (editarDoctor) {
-        // Actualizar doctor existente
         response = await fetch(`${API_BASE_URL}/users/${editarDoctor}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(payload),
         });
       } else {
-        // Crear nuevo doctor
         if (!password || password !== confirmPassword) {
           alert("Las contraseñas no coinciden o están vacías");
           return;
         }
-
-        const payload = {
-          ...formData,
-          rol: "ROLE_MEDICO",
-        };
-
-        response = await fetch(`${API_BASE_URL}/users/register`, {
+        response = await fetch(`${API_BASE_URL}/users/doctors`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -147,47 +139,36 @@ const cargarEspecialidades = async () => {
       await cargarDoctores();
       cerrarModal();
     } catch (error) {
-      console.error("Error al guardar doctor:", error);
+      console.error(error);
       alert("Error al guardar doctor");
     }
   };
 
   // 🔹 Eliminar doctor
   const handleEliminar = async (codigo) => {
-    if (!window.confirm("¿Eliminar doctor? Esta acción no se puede deshacer")) return;
-
+    if (!window.confirm("¿Eliminar doctor?")) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.error || "Error al eliminar doctor");
-        return;
-      }
-
+      const response = await fetch(`${API_BASE_URL}/users/${codigo}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      if (!response.ok) throw new Error("Error al eliminar doctor");
       await cargarDoctores();
     } catch (error) {
-      console.error("Error al eliminar doctor:", error);
+      console.error(error);
       alert("Error al eliminar doctor");
     }
   };
 
-  // 🔹 Filtrado y orden
   const doctoresFiltrados = doctores
     .filter(d => d.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-    .sort((a, b) =>
-      orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre)
-    );
+    .sort((a, b) => (orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre)));
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Gestión de Doctores</h2>
+        <h2>Gestión de Doctores</h2>
         <Button text="Agregar Doctor" onClick={() => abrirModal()} />
       </div>
 
+      {/* Filtros */}
       <div className="row mb-3">
         <div className="col-md-6">
           <input
@@ -195,26 +176,24 @@ const cargarEspecialidades = async () => {
             className="form-control"
             placeholder="Buscar doctor..."
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={e => setBusqueda(e.target.value)}
           />
         </div>
         <div className="col-md-3 ms-auto">
-          <select
-            className="form-select"
-            value={orden}
-            onChange={(e) => setOrden(e.target.value)}
-          >
+          <select className="form-select" value={orden} onChange={e => setOrden(e.target.value)}>
             <option value="asc">Ordenar A-Z</option>
             <option value="desc">Ordenar Z-A</option>
           </select>
         </div>
       </div>
 
+      {/* Tabla */}
       <div className="table-responsive">
         <table className="table table-striped table-hover table-bordered align-middle">
           <thead className="table-primary">
             <tr>
               <th>Nombre</th>
+              <th>Apellido</th>
               <th>DNI</th>
               <th>Sexo</th>
               <th>Email</th>
@@ -225,20 +204,17 @@ const cargarEspecialidades = async () => {
           </thead>
           <tbody>
             {doctoresFiltrados.length === 0 ? (
-              <tr><td colSpan={7} className="text-center">No hay doctores</td></tr>
+              <tr><td colSpan={8} className="text-center">No hay doctores</td></tr>
             ) : (
               doctoresFiltrados.map(d => (
                 <tr key={d.codigo}>
                   <td>{d.nombre}</td>
+                  <td>{d.apellido}</td>
                   <td>{d.dni}</td>
                   <td>{d.sexo}</td>
                   <td>{d.email}</td>
                   <td>{d.telefono}</td>
-                  <td>
-                    <span className={`badge ${d.estado === "Activo" ? "bg-success" : "bg-secondary"}`}>
-                      {d.estado}
-                    </span>
-                  </td>
+                  <td><span className={`badge ${d.estado === "Activo" ? "bg-success" : "bg-secondary"}`}>{d.estado}</span></td>
                   <td>
                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => abrirModal(d)}>Editar</button>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleEliminar(d.codigo)}>Eliminar</button>
@@ -260,60 +236,43 @@ const cargarEspecialidades = async () => {
                 <button type="button" className="btn-close" onClick={cerrarModal}></button>
               </div>
               <div className="modal-body">
-                <input
-                  className="form-control mb-2"
-                  placeholder="Nombre"
-                  value={formData.nombre}
-                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="DNI"
-                  value={formData.dni}
-                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
-                />
-                <SelectField
-                  id="sexo"
-                  name="sexo"
-                  value={formData.sexo}
-                  onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
-                  options={opcionesSexo}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Teléfono"
-                  value={formData.telefono}
-                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                />
+                <input className="form-control mb-2" placeholder="Nombre" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
+                <input className="form-control mb-2" placeholder="Apellido" value={formData.apellido} onChange={e => setFormData({ ...formData, apellido: e.target.value })} />
+                <input className="form-control mb-2" placeholder="DNI" value={formData.dni} onChange={e => setFormData({ ...formData, dni: e.target.value })} />
+                <SelectField id="sexo" name="sexo" value={formData.sexo} onChange={e => setFormData({ ...formData, sexo: e.target.value })} options={opcionesSexo} />
+                <input className="form-control mb-2" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                <input className="form-control mb-2" placeholder="Teléfono" value={formData.telefono} onChange={e => setFormData({ ...formData, telefono: e.target.value })} />
+
                 {!editarDoctor && (
                   <>
-                    <input
-                      type="password"
-                      className="form-control mb-2"
-                      placeholder="Contraseña"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    />
-                    <input
-                      type="password"
-                      className="form-control mb-2"
-                      placeholder="Confirmar Contraseña"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    />
+                    <input type="password" className="form-control mb-2" placeholder="Contraseña" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                    <input type="password" className="form-control mb-2" placeholder="Confirmar Contraseña" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} />
                   </>
                 )}
-                <select
-                  className="form-select"
-                  value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                >
+
+                {/* Especialidades */}
+                <div className="mb-2">
+                  <label className="form-label">Especialidades</label>
+                  <div className="d-flex flex-column">
+                    {especialidades.map(esp => (
+                      <div key={esp.id} className="form-check">
+                        <input type="checkbox" className="form-check-input" id={`esp-${esp.id}`} value={esp.id}
+                          checked={formData.especialidades.includes(esp.id)}
+                          onChange={e => {
+                            const id = Number(e.target.value);
+                            let nuevasEspecialidades = e.target.checked
+                              ? [...formData.especialidades, id]
+                              : formData.especialidades.filter(eid => eid !== id);
+                            setFormData({ ...formData, especialidades: nuevasEspecialidades });
+                          }}
+                        />
+                        <label className="form-check-label" htmlFor={`esp-${esp.id}`}>{esp.nombre}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <select className="form-select" value={formData.estado} onChange={e => setFormData({ ...formData, estado: e.target.value })}>
                   <option value="Activo">Activo</option>
                   <option value="Inactivo">Inactivo</option>
                 </select>
