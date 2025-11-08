@@ -1,90 +1,138 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../../config";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function VistaEspecialidad() {
   const [especialidades, setEspecialidades] = useState([]);
+  const token = localStorage.getItem("token"); // 🔹 Obtener token
 
-  // Cargar especialidades desde localStorage
+  // Cargar especialidades desde la API
   useEffect(() => {
+  const cargarEspecialidades = async () => {
     try {
-      const stored = localStorage.getItem("especialidades");
-      if (stored) {
-        setEspecialidades(JSON.parse(stored));
-      } else {
-        localStorage.setItem("especialidades", JSON.stringify([]));
-        setEspecialidades([]);
-      }
+      const response = await fetch(`${API_BASE_URL}/specialties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al obtener especialidades");
+      const data = await response.json();
+      setEspecialidades(data);
     } catch (error) {
-      console.error("Error leyendo especialidades de localStorage:", error);
-      localStorage.setItem("especialidades", JSON.stringify([]));
-      setEspecialidades([]);
+      console.error("Error al cargar especialidades:", error);
+      Swal.fire("Error", "No se pudieron cargar las especialidades", "error");
     }
-  }, []);
+  };
 
-  // Guardar en localStorage cada vez que cambie
-  useEffect(() => {
+  cargarEspecialidades();
+}, [token]);
+
+
+  const cargarEspecialidades = async () => {
     try {
-      localStorage.setItem("especialidades", JSON.stringify(especialidades));
+      const response = await fetch(`${API_BASE_URL}/specialties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al obtener especialidades");
+      const data = await response.json();
+      setEspecialidades(data);
     } catch (error) {
-      console.error("Error guardando especialidades en localStorage:", error);
+      console.error("Error al cargar especialidades:", error);
+      Swal.fire("Error", "No se pudieron cargar las especialidades", "error");
     }
-  }, [especialidades]);
+  };
 
-  const handleAgregarEspecialidad = () => {
-    Swal.fire({
+  // 🔹 Agregar especialidad
+  const handleAgregarEspecialidad = async () => {
+    const { value: nombre } = await Swal.fire({
       title: "Nueva Especialidad",
       input: "text",
       inputPlaceholder: "Nombre de la especialidad",
       showCancelButton: true,
       confirmButtonText: "Agregar",
-    }).then((result) => {
-      if (result.isConfirmed && result.value.trim()) {
-        const nueva = {
-          id: especialidades.length > 0 ? especialidades[especialidades.length - 1].id + 1 : 1,
-          nombre: result.value.trim(),
-        };
-        setEspecialidades((prev) => [...prev, nueva]);
-        Swal.fire("¡Agregado!", "La especialidad fue agregada.", "success");
-      }
     });
+
+    if (!nombre || !nombre.trim()) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/specialties/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nombre: nombre.trim() }),
+      });
+
+      if (!response.ok) throw new Error("Error al crear especialidad");
+
+      Swal.fire("✅ Agregado", "La especialidad fue registrada correctamente", "success");
+      cargarEspecialidades();
+    } catch (error) {
+      console.error("Error al agregar especialidad:", error);
+      Swal.fire("Error", "No se pudo agregar la especialidad", "error");
+    }
   };
 
-  const handleEditar = (id) => {
-    const esp = especialidades.find((e) => e.id === id);
-    if (!esp) return;
-
-    Swal.fire({
+  // 🔹 Editar especialidad
+  const handleEditar = async (esp) => {
+    const { value: nuevoNombre } = await Swal.fire({
       title: "Editar Especialidad",
       input: "text",
       inputValue: esp.nombre,
       showCancelButton: true,
       confirmButtonText: "Guardar",
-    }).then((result) => {
-      if (result.isConfirmed && result.value.trim()) {
-        setEspecialidades((prev) =>
-          prev.map((e) => (e.id === id ? { ...e, nombre: result.value.trim() } : e))
-        );
-        Swal.fire("¡Actualizado!", "La especialidad fue editada.", "success");
-      }
     });
+
+    if (!nuevoNombre || !nuevoNombre.trim()) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/specialties/${esp.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nombre: nuevoNombre.trim() }),
+      });
+
+      if (!response.ok) throw new Error("Error al actualizar especialidad");
+
+      Swal.fire("✅ Actualizado", "La especialidad fue modificada", "success");
+      cargarEspecialidades();
+    } catch (error) {
+      console.error("Error al editar especialidad:", error);
+      Swal.fire("Error", "No se pudo editar la especialidad", "error");
+    }
   };
 
-  const handleEliminar = (id) => {
-    Swal.fire({
+  // 🔹 Eliminar especialidad
+  const handleEliminar = async (id) => {
+    const result = await Swal.fire({
       title: "¿Eliminar especialidad?",
       text: "Esta acción no se puede deshacer",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setEspecialidades((prev) => prev.filter((e) => e.id !== id));
-        Swal.fire("¡Eliminado!", "La especialidad fue eliminada.", "success");
-      }
     });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/specialties/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Error al eliminar especialidad");
+
+      Swal.fire("✅ Eliminado", "La especialidad fue eliminada", "success");
+      cargarEspecialidades();
+    } catch (error) {
+      console.error("Error al eliminar especialidad:", error);
+      Swal.fire("Error", "No se pudo eliminar la especialidad", "error");
+    }
   };
 
   return (
@@ -109,7 +157,9 @@ function VistaEspecialidad() {
           <tbody>
             {especialidades.length === 0 ? (
               <tr>
-                <td colSpan={3} className="text-center">No hay especialidades</td>
+                <td colSpan={3} className="text-center">
+                  No hay especialidades
+                </td>
               </tr>
             ) : (
               especialidades.map((esp) => (
@@ -120,7 +170,7 @@ function VistaEspecialidad() {
                     <button
                       className="btn btn-sm btn-outline-primary me-1"
                       title="Editar"
-                      onClick={() => handleEditar(esp.id)}
+                      onClick={() => handleEditar(esp)}
                     >
                       <i className="bi bi-pencil-square"></i>
                     </button>

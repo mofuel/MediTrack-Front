@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
 import SelectField from "../../components/SelectField";
+import API_BASE_URL from "../../config";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function VistaDoctores() {
@@ -8,8 +9,6 @@ function VistaDoctores() {
   const [especialidades, setEspecialidades] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [orden, setOrden] = useState("asc");
-
-  // Estados para modal
   const [showModal, setShowModal] = useState(false);
   const [editarDoctor, setEditarDoctor] = useState(null);
   const [formData, setFormData] = useState({
@@ -18,39 +17,69 @@ function VistaDoctores() {
     sexo: "",
     email: "",
     telefono: "",
+    password: "",
+    confirmPassword: "",
     especialidades: [],
     estado: "Activo",
   });
 
-  // Opciones mockeadas de sexo
   const opcionesSexo = [
     { value: "MASCULINO", label: "Masculino" },
     { value: "FEMENINO", label: "Femenino" },
   ];
 
-  // Cargar doctores y especialidades desde localStorage
+  // 🔹 Cargar doctores y especialidades desde la API
   useEffect(() => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const medicos = Object.values(usuarios).filter(u => u.rol === "ROLE_MEDICO");
-    setDoctores(medicos);
-
-    const especialidadesLS = JSON.parse(localStorage.getItem("especialidades")) || [];
-    setEspecialidades(especialidadesLS);
+    cargarDoctores();
+    cargarEspecialidades();
   }, []);
 
-  const guardarDoctores = (updatedDoctores) => {
-    setDoctores(updatedDoctores);
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    updatedDoctores.forEach(doc => {
-      usuarios[doc.codigo] = doc;
+  const cargarDoctores = async () => {
+  try {
+    const token = localStorage.getItem("token"); // Obtén tu JWT guardado
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-  };
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setDoctores(data.filter(u => u.rol === "ROLE_MEDICO"));
+  } catch (error) {
+    console.error("Error al cargar doctores:", error);
+  }
+};
+
+const cargarEspecialidades = async () => {
+  try {
+    const token = localStorage.getItem("token"); // Obtén tu JWT guardado
+    const response = await fetch(`${API_BASE_URL}/specialties`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setEspecialidades(data);
+  } catch (error) {
+    console.error("Error al cargar especialidades:", error);
+  }
+};
 
   const abrirModal = (doctor = null) => {
     if (doctor) {
       setEditarDoctor(doctor.codigo);
-      setFormData({ ...doctor });
+      setFormData({ ...doctor, password: "", confirmPassword: "" });
     } else {
       setEditarDoctor(null);
       setFormData({
@@ -59,6 +88,8 @@ function VistaDoctores() {
         sexo: "",
         email: "",
         telefono: "",
+        password: "",
+        confirmPassword: "",
         especialidades: [],
         estado: "Activo",
       });
@@ -68,41 +99,87 @@ function VistaDoctores() {
 
   const cerrarModal = () => setShowModal(false);
 
-  const handleSubmit = (e) => {
+  // 🔹 Guardar o editar doctor
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { nombre, dni, sexo, email, telefono } = formData;
-    if (!nombre || !dni || !sexo || !email || !telefono) return alert("Todos los campos son obligatorios");
 
-    if (editarDoctor) {
-      const updated = doctores.map(d =>
-        d.codigo === editarDoctor ? { ...d, ...formData } : d
-      );
-      guardarDoctores(updated);
-    } else {
-      const nuevo = { ...formData, codigo: Date.now().toString(), rol: "ROLE_MEDICO" };
-      guardarDoctores([...doctores, nuevo]);
+    const { nombre, dni, sexo, email, telefono, password, confirmPassword } = formData;
+
+    if (!nombre || !dni || !sexo || !email || !telefono) {
+      alert("Todos los campos son obligatorios");
+      return;
     }
-    cerrarModal();
+
+    try {
+      let response;
+      if (editarDoctor) {
+        // Actualizar doctor existente
+        response = await fetch(`${API_BASE_URL}/users/${editarDoctor}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+      } else {
+        // Crear nuevo doctor
+        if (!password || password !== confirmPassword) {
+          alert("Las contraseñas no coinciden o están vacías");
+          return;
+        }
+
+        const payload = {
+          ...formData,
+          rol: "ROLE_MEDICO",
+        };
+
+        response = await fetch(`${API_BASE_URL}/users/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || "Error al guardar el doctor");
+        return;
+      }
+
+      await cargarDoctores();
+      cerrarModal();
+    } catch (error) {
+      console.error("Error al guardar doctor:", error);
+      alert("Error al guardar doctor");
+    }
   };
 
-  const handleEliminar = (codigo) => {
-    if (window.confirm("¿Eliminar doctor? Esta acción no se puede deshacer")) {
-      guardarDoctores(doctores.filter(d => d.codigo !== codigo));
+  // 🔹 Eliminar doctor
+  const handleEliminar = async (codigo) => {
+    if (!window.confirm("¿Eliminar doctor? Esta acción no se puede deshacer")) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || "Error al eliminar doctor");
+        return;
+      }
+
+      await cargarDoctores();
+    } catch (error) {
+      console.error("Error al eliminar doctor:", error);
+      alert("Error al eliminar doctor");
     }
   };
 
+  // 🔹 Filtrado y orden
   const doctoresFiltrados = doctores
     .filter(d => d.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-    .sort((a, b) => orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre));
-
-  const nombreEspecialidades = (ids = []) => {
-    if (!Array.isArray(ids)) return "";
-    return ids
-      .map(id => especialidades.find(e => e.id === id)?.nombre)
-      .filter(Boolean)
-      .join(", ");
-  };
-
+    .sort((a, b) =>
+      orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre)
+    );
 
   return (
     <div className="container mt-4">
@@ -138,7 +215,6 @@ function VistaDoctores() {
           <thead className="table-primary">
             <tr>
               <th>Nombre</th>
-              <th>Especialidades</th>
               <th>DNI</th>
               <th>Sexo</th>
               <th>Email</th>
@@ -149,12 +225,11 @@ function VistaDoctores() {
           </thead>
           <tbody>
             {doctoresFiltrados.length === 0 ? (
-              <tr><td colSpan={8} className="text-center">No hay doctores</td></tr>
+              <tr><td colSpan={7} className="text-center">No hay doctores</td></tr>
             ) : (
               doctoresFiltrados.map(d => (
                 <tr key={d.codigo}>
                   <td>{d.nombre}</td>
-                  <td>{nombreEspecialidades(d.especialidades)}</td>
                   <td>{d.dni}</td>
                   <td>{d.sexo}</td>
                   <td>{d.email}</td>
@@ -197,16 +272,13 @@ function VistaDoctores() {
                   value={formData.dni}
                   onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
                 />
-                <div className="mb-2">
-                  <label className="form-label">Sexo:</label>
-                  <SelectField
-                    id="sexo"
-                    name="sexo"
-                    value={formData.sexo}
-                    onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
-                    options={opcionesSexo}
-                  />
-                </div>
+                <SelectField
+                  id="sexo"
+                  name="sexo"
+                  value={formData.sexo}
+                  onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
+                  options={opcionesSexo}
+                />
                 <input
                   className="form-control mb-2"
                   placeholder="Email"
@@ -219,39 +291,24 @@ function VistaDoctores() {
                   value={formData.telefono}
                   onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
                 />
-
-                {/* Especialidades con checkboxes */}
-                <div className="sub-card mb-2">
-                  <h6 className="sub-card-title">Especialidades</h6>
-                  {especialidades.length === 0 ? (
-                    <p>No hay especialidades disponibles</p>
-                  ) : (
-                    especialidades.map((e) => (
-                      <div className="form-check" key={e.id}>
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          id={`esp-${e.id}`}
-                          value={e.id}
-                          checked={formData.especialidades.includes(e.id)}
-                          onChange={() => {
-                            const id = e.id;
-                            setFormData((prev) => ({
-                              ...prev,
-                              especialidades: prev.especialidades.includes(id)
-                                ? prev.especialidades.filter((x) => x !== id)
-                                : [...prev.especialidades, id],
-                            }));
-                          }}
-                        />
-                        <label className="form-check-label" htmlFor={`esp-${e.id}`}>
-                          {e.nombre}
-                        </label>
-                      </div>
-                    ))
-                  )}
-                </div>
-
+                {!editarDoctor && (
+                  <>
+                    <input
+                      type="password"
+                      className="form-control mb-2"
+                      placeholder="Contraseña"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    <input
+                      type="password"
+                      className="form-control mb-2"
+                      placeholder="Confirmar Contraseña"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    />
+                  </>
+                )}
                 <select
                   className="form-select"
                   value={formData.estado}
@@ -269,7 +326,6 @@ function VistaDoctores() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -151,34 +151,52 @@ function VistaPacientes() {
     }
   };
 
-  // 🗑️ Eliminar
+  // Eliminar
   const handleEliminar = async (codigo) => {
-    const result = await Swal.fire({
+    const confirmacion = await Swal.fire({
       title: "¿Eliminar paciente?",
       text: "Esta acción no se puede deshacer",
       icon: "warning",
       showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
+      cancelButtonText: "Cancelar"
     });
 
-    if (!result.isConfirmed) return;
+    if (!confirmacion.isConfirmed) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { "Authorization": `Bearer ${token}` },
       });
 
-      if (!response.ok) throw new Error("Error al eliminar paciente");
+      const result = await response.json();
 
-      setPacientes(pacientes.filter((p) => p.codigo !== codigo));
-      Swal.fire("Eliminado", "El paciente ha sido eliminado", "success");
+      if (!response.ok) {
+        throw new Error(result.error || "Error al eliminar paciente");
+      }
+
+      setPacientes(pacientes.filter(p => p.codigo !== codigo));
+
+      Swal.fire({
+        icon: "success",
+        title: "Eliminado",
+        text: "✅ Paciente eliminado correctamente",
+        timer: 1800,
+        showConfirmButton: false
+      });
     } catch (error) {
       console.error("❌ Error al eliminar paciente:", error);
-      Swal.fire("Error", "No se pudo eliminar el paciente", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo eliminar el paciente",
+      });
     }
   };
+
 
   // 🔍 Filtro + orden
   const pacientesFiltrados = pacientes
@@ -266,9 +284,8 @@ function VistaPacientes() {
                   <td>{obtenerNombreRol(p.rol)}</td>
                   <td>
                     <span
-                      className={`badge ${
-                        p.activo ? "bg-success" : "bg-secondary"
-                      }`}
+                      className={`badge ${p.activo ? "bg-success" : "bg-secondary"
+                        }`}
                     >
                       {p.activo ? "Activo" : "Inactivo"}
                     </span>
