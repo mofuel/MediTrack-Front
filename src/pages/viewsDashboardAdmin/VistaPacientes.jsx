@@ -207,20 +207,8 @@ function VistaPacientes() {
         : b.nombre.localeCompare(a.nombre)
     );
 
-  const obtenerNombreRol = (rol) => {
-    switch (rol) {
-      case "ROLE_PACIENTE":
-        return "Paciente";
-      case "ROLE_MEDICO":
-        return "Médico";
-      case "ROLE_ADMIN":
-        return "Administrador";
-      default:
-        return rol;
-    }
-  };
 
-  // ✅ Render
+    
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -261,7 +249,6 @@ function VistaPacientes() {
               <th>Sexo</th>
               <th>Email</th>
               <th>Teléfono</th>
-              <th>Rol</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -269,7 +256,7 @@ function VistaPacientes() {
           <tbody>
             {pacientesFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center">
+                <td colSpan={7} className="text-center">
                   No hay pacientes
                 </td>
               </tr>
@@ -281,11 +268,9 @@ function VistaPacientes() {
                   <td>{p.sexo}</td>
                   <td>{p.email}</td>
                   <td>{p.telefono}</td>
-                  <td>{obtenerNombreRol(p.rol)}</td>
                   <td>
                     <span
-                      className={`badge ${p.activo ? "bg-success" : "bg-secondary"
-                        }`}
+                      className={`badge ${p.activo ? "bg-success" : "bg-secondary"}`}
                     >
                       {p.activo ? "Activo" : "Inactivo"}
                     </span>
@@ -310,6 +295,7 @@ function VistaPacientes() {
           </tbody>
         </table>
       </div>
+
 
       {/* Modal */}
       {showModal && (

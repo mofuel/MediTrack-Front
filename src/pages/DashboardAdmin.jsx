@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../css/Dash.css';
 import '../css/colors.css';
 import logo from '../assets/logg.png';
+import API_BASE_URL from '../config';
 
 import VistaDashboard from "./viewsDashboardAdmin/VistaDashboard";
 import VistaCitas from "./viewsDashboardAdmin/VistaCitas";
@@ -15,6 +16,10 @@ function DashboardAdmin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
 
+  // Contadores
+  const [cantidadDoctores, setCantidadDoctores] = useState(0);
+  const [cantidadPacientes, setCantidadPacientes] = useState(0);
+
   // Inicializa especialidades solo si no existe
   useEffect(() => {
     if (!localStorage.getItem("especialidades")) {
@@ -22,6 +27,35 @@ function DashboardAdmin() {
     }
   }, []);
 
+  // Cargar cantidad de doctores y pacientes
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    const fetchCantidades = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error("Error al cargar usuarios");
+
+        const data = await response.json();
+        const doctores = data.filter(u => u.rol === "ROLE_MEDICO").length;
+        const pacientes = data.filter(u => u.rol === "ROLE_PACIENTE").length;
+
+        console.log("Usuarios recibidos:", data); // <-- Aquí mostramos todos los usuarios
+        console.log("Cantidad Doctores:", doctores); // <-- Ver cantidad de doctores
+        console.log("Cantidad Pacientes:", pacientes); // <-- Ver cantidad de pacientes
+
+        setCantidadDoctores(doctores);
+        setCantidadPacientes(pacientes);
+      } catch (error) {
+        console.error("❌ Error al cargar cantidades:", error);
+      }
+    };
+
+    fetchCantidades();
+  }, []);
 
   const codigoUsuario = localStorage.getItem("codigoUsuario");
   const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
@@ -38,7 +72,14 @@ function DashboardAdmin() {
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <VistaDashboard />;
+        return (
+          <div>
+            <VistaDashboard
+              cantidadDoctores={cantidadDoctores}
+              cantidadPacientes={cantidadPacientes}
+            />
+          </div>
+        );
       case 'pacientes':
         return <VistaPacientes />;
       case 'citas':
@@ -50,7 +91,12 @@ function DashboardAdmin() {
       case 'especialidades':
         return <VistaEspecialidad />;
       default:
-        return <VistaDashboard />;
+        return (
+          <VistaDashboard
+            cantidadDoctores={cantidadDoctores}
+            cantidadPacientes={cantidadPacientes}
+          />
+        );
     }
   };
 
@@ -58,13 +104,16 @@ function DashboardAdmin() {
     localStorage.removeItem("token");
     localStorage.removeItem("rol");
     localStorage.removeItem("codigoUsuario");
-
     navigate("/");
   };
 
+  console.log("Props que se enviarán a VistaDashboard:", {
+    cantidadDoctores,
+    cantidadPacientes
+  }); // <-- Ver props justo antes de renderizar
+
   return (
     <div className="app-container">
-      {/* Sidebar */}
       <nav className="sidebar">
         <div className="sidebar-header">
           <img src={logo} alt="Logo DashAdmin" className="logo-img" />
@@ -84,7 +133,6 @@ function DashboardAdmin() {
         </ul>
       </nav>
 
-      {/* Main Content */}
       <main className="main-content">
         <header className="header">
           <h1>Panel de Administración</h1>
@@ -95,6 +143,7 @@ function DashboardAdmin() {
             </button>
           </div>
         </header>
+
         {renderContent()}
       </main>
     </div>

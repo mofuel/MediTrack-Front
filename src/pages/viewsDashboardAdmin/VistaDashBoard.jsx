@@ -1,79 +1,54 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
 import { useState, useEffect } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from "recharts";
 
-function VistaDashboard() {
+function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
+
   const [stats, setStats] = useState({
-    pacientes: 0,
-    citasHoy: 0,
-    doctores: 0,
-    ingresos: 15400, 
+    pacientes: cantidadPacientes,
+    doctores: cantidadDoctores,
+    citasHoy: 2, // valor por defecto
+    ingresos: 15400, // valor fijo
   });
 
-  const [citasData, setCitasData] = useState([]);
-  const [estadoCitas, setEstadoCitas] = useState([]);
-  const colores = ["#4caf50", "#f44336", "#ff9800"];
-
+  // Actualiza cuando cambian los props
   useEffect(() => {
-    // Obtener usuarios desde localStorage
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const pacientes = Object.values(usuarios).filter(u => u.rol === "ROLE_PACIENTE");
-    const doctores = Object.values(usuarios).filter(u => u.rol === "ROLE_MEDICO");
+    setStats(prev => ({
+      ...prev,
+      pacientes: cantidadPacientes,
+      doctores: cantidadDoctores,
+    }));
+  }, [cantidadDoctores, cantidadPacientes]);
 
-    // Obtener citas desde localStorage
-    const citas = JSON.parse(localStorage.getItem("citas")) || [];
+  // Datos de gráficos ficticios
+  const [citasData] = useState([
+    { mes: "Enero", citas: 2 },
+    { mes: "Febrero", citas: 2 },
+    { mes: "Marzo", citas: 2 },
+    { mes: "Abril", citas: 2 },
+    { mes: "Mayo", citas: 2 },
+    { mes: "Junio", citas: 2 },
+    { mes: "Julio", citas: 2 },
+    { mes: "Agosto", citas: 2 },
+    { mes: "Septiembre", citas: 2 },
+    { mes: "Octubre", citas: 2 },
+    { mes: "Noviembre", citas: 2 },
+    { mes: "Diciembre", citas: 2 },
+  ]);
 
-    // Citas de hoy
-    const hoy = new Date().toISOString().split("T")[0];
-    const citasHoy = citas.filter(c => c.fecha === hoy).length;
+  const [estadoCitas] = useState([
+    { name: "Completadas", value: 2 },
+    { name: "Canceladas", value: 0 },
+    { name: "Pendientes", value: 0 },
+  ]);
 
-    // Estadísticas de estado de citas
-    const completadas = citas.filter(c => c.estado === "COMPLETADA").length;
-    const canceladas = citas.filter(c => c.estado === "CANCELADA").length;
-    const pendientes = citas.filter(c => c.estado === "PENDIENTE").length;
-
-    // Citas por mes
-    const meses = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-
-    const citasPorMes = meses.map((mes, index) => {
-      const monthNumber = index + 1; // Enero = 1
-      const count = citas.filter(c => {
-        const fecha = new Date(c.fecha);
-        return fecha.getMonth() + 1 === monthNumber;
-      }).length;
-      return { mes, citas: count };
-    });
-
-    setStats({
-      pacientes: pacientes.length,
-      citasHoy,
-      doctores: doctores.length,
-      ingresos: 15400,
-    });
-
-    setCitasData(citasPorMes);
-    setEstadoCitas([
-      { name: "Completadas", value: completadas },
-      { name: "Canceladas", value: canceladas },
-      { name: "Pendientes", value: pendientes },
-    ]);
-  }, []);
+  const colores = ["#4caf50", "#f44336", "#ff9800"];
 
   return (
     <div className="dashboard-content">
+      {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
           <h2>Total de Pacientes</h2>
@@ -93,6 +68,7 @@ function VistaDashboard() {
         </div>
       </div>
 
+      {/* Gráficos */}
       <div className="reportes-grid">
         <div className="reporte-card">
           <h3>Citas por Año</h3>
@@ -121,7 +97,7 @@ function VistaDashboard() {
                 label
               >
                 {estadoCitas.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={colores[index % colores.length]} />
+                  <Cell key={index} fill={colores[index % colores.length]} />
                 ))}
               </Pie>
               <Tooltip />
