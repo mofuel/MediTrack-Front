@@ -11,6 +11,7 @@ import VistaDoctores from "./viewsDashboardAdmin/VistaDoctores";
 import VistaReportes from "./viewsDashboardAdmin/VistaReportes";
 import VistaEspecialidad from "./viewsDashboardAdmin/VistaEspecialidad";
 import VistaPacientes from './viewsDashboardAdmin/VistaPacientes';
+import VistaTurnosClinica from './viewsDashboardAdmin/VistaTurnosClinica';
 
 function DashboardAdmin() {
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ function DashboardAdmin() {
     { id: 'doctores', label: 'Doctores' },
     { id: 'citas', label: 'Citas' },
     { id: 'especialidades', label: 'Especialidades' },
+    { id: 'turnos', label: 'Turnos Clínica' },
   ];
 
   const renderContent = () => {
@@ -90,6 +92,8 @@ function DashboardAdmin() {
         return <VistaReportes />;
       case 'especialidades':
         return <VistaEspecialidad />;
+      case 'turnos':
+        return <VistaTurnosClinica />;
       default:
         return (
           <VistaDashboard
