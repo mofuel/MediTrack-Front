@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Button from "../components/Button";
 import "../css/CrearPerfilMedico.css";
-import API_BASE_URL from "../config"; 
+import API_BASE_URL from "../config";
 
 function CrearPerfilMedico() {
   const [especialidades, setEspecialidades] = useState([]);
@@ -86,11 +86,12 @@ function CrearPerfilMedico() {
     try {
       const perfilPayload = {
         codigoUsuario,
-        especialidades: selectedEspecialidades,
-        turnos: turnosSeleccionados,
+        especialidades: selectedEspecialidades.map((id) => ({ id })), 
+        turnos: turnosSeleccionados.map((id) => ({ id })), 
       };
 
-      const response = await fetch(`${API_BASE_URL}/perfil-medico`, {
+
+      const response = await fetch(`${API_BASE_URL}/perfil-medico/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

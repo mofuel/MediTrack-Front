@@ -1,48 +1,94 @@
 import React, { useState, useEffect } from "react";
 import { Card, Form, Row, Col, Modal } from "react-bootstrap";
+import Swal from "sweetalert2";
 import NavMedico from "../components/NavMedico";
 import EstadoBadge from "../components/EstadoBadge";
 import CustomButton from "../components/Button";
 import SelectField from "../components/SelectField";
 import "../css/PerfilMedico.css";
+import API_BASE_URL from "../config";
 
 function PerfilMedico() {
   const [editando, setEditando] = useState(false);
   const [perfil, setPerfil] = useState(null);
-
   const codigoMedico = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
 
+  // 🟢 Obtener datos del perfil desde el backend
   useEffect(() => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const medico = usuarios[codigoMedico];
+    const fetchPerfil = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/${codigoMedico}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    if (medico) {
-      setPerfil({
-        codigo: medico.codigo || "",
-        nombre: medico.nombre || "",
-        apellido: medico.apellido || "",
-        dni: medico.dni || "",
-        sexo: medico.sexo || "",
-        email: medico.email || "",
-        telefono: medico.telefono || "",
-        estado: medico.estado || "Activo",
-      });
+        if (!response.ok) throw new Error("Error al cargar perfil");
+
+        const data = await response.json();
+        setPerfil({
+          codigo: data.codigo,
+          nombre: data.nombre,
+          apellido: data.apellido,
+          dni: data.dni,
+          sexo: data.sexo,
+          email: data.email,
+          telefono: data.telefono,
+          estado: data.activo ? "Activo" : "Inactivo",
+        });
+      } catch (error) {
+        console.error("❌ Error al cargar perfil:", error);
+        Swal.fire("Error", "No se pudo cargar el perfil", "error");
+      }
+    };
+
+    if (codigoMedico && token) {
+      fetchPerfil();
     }
-  }, [codigoMedico]);
+  }, [codigoMedico, token]);
 
+  // 🟡 Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPerfil((prev) => ({ ...prev, [name]: value }));
   };
 
-  const guardarCambios = () => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    usuarios[codigoMedico] = { ...usuarios[codigoMedico], ...perfil };
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-    setEditando(false);
+  // 🟣 Guardar cambios en el backend
+  const guardarCambios = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${perfil.codigo}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          nombre: perfil.nombre,
+          apellido: perfil.apellido,
+          dni: perfil.dni,
+          sexo: perfil.sexo,
+          email: perfil.email,
+          telefono: perfil.telefono,
+          activo: perfil.estado === "Activo",
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error al actualizar perfil");
+
+      const actualizado = await response.json();
+      setPerfil({
+        ...actualizado,
+        estado: actualizado.activo ? "Activo" : "Inactivo",
+      });
+      setEditando(false);
+
+      Swal.fire("✅ Perfil actualizado", "Los cambios se guardaron correctamente", "success");
+    } catch (error) {
+      console.error("❌ Error al actualizar perfil:", error);
+      Swal.fire("Error", "No se pudo actualizar el perfil", "error");
+    }
   };
 
-  if (!perfil) return <p>Cargando perfil...</p>;
+  if (!perfil) return <p className="text-center mt-5">Cargando perfil...</p>;
 
   return (
     <>
@@ -53,13 +99,25 @@ function PerfilMedico() {
           <Card.Body>
             {!editando ? (
               <>
-                <h2 className="perfil-nombre mb-3">{perfil.nombre} {perfil.apellido}</h2>
+                <h2 className="perfil-nombre mb-3">
+                  {perfil.nombre} {perfil.apellido}
+                </h2>
 
-                <p className="perfil-dato"><strong>Código:</strong> {perfil.codigo}</p>
-                <p className="perfil-dato"><strong>DNI:</strong> {perfil.dni}</p>
-                <p className="perfil-dato"><strong>Sexo:</strong> {perfil.sexo}</p>
-                <p className="perfil-dato"><strong>Email:</strong> {perfil.email}</p>
-                <p className="perfil-dato"><strong>Teléfono:</strong> {perfil.telefono || "—"}</p>
+                <p className="perfil-dato">
+                  <strong>Código:</strong> {perfil.codigo}
+                </p>
+                <p className="perfil-dato">
+                  <strong>DNI:</strong> {perfil.dni}
+                </p>
+                <p className="perfil-dato">
+                  <strong>Sexo:</strong> {perfil.sexo}
+                </p>
+                <p className="perfil-dato">
+                  <strong>Email:</strong> {perfil.email}
+                </p>
+                <p className="perfil-dato">
+                  <strong>Teléfono:</strong> {perfil.telefono || "—"}
+                </p>
 
                 <EstadoBadge estado={perfil.estado === "Activo" ? "activo" : "inactivo"} />
 
@@ -111,7 +169,7 @@ function PerfilMedico() {
                             onChange={handleChange}
                             options={[
                               { value: "FEMENINO", label: "FEMENINO" },
-                              { value: "MASCULINO", label: "MASCULINO" }
+                              { value: "MASCULINO", label: "MASCULINO" },
                             ]}
                             placeholder="Seleccione sexo"
                           />
@@ -142,8 +200,16 @@ function PerfilMedico() {
                   </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                  <CustomButton text="Guardar" onClick={guardarCambios} className="btn-success" />
-                  <CustomButton text="Cancelar" onClick={() => setEditando(false)} className="btn-secondary" />
+                  <CustomButton
+                    text="Guardar"
+                    onClick={guardarCambios}
+                    className="btn-success"
+                  />
+                  <CustomButton
+                    text="Cancelar"
+                    onClick={() => setEditando(false)}
+                    className="btn-secondary"
+                  />
                 </Modal.Footer>
               </Modal>
             )}
