@@ -8,25 +8,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import AuthLayout from "../layouts/AuthLayout";
 import { useNavigate } from "react-router-dom";
-
-
-
 import { useState } from "react";
 import { Modal, Form } from "react-bootstrap";
 
 function Login() {
-
   const [showModal, setShowModal] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [emailRecuperar, setEmailRecuperar] = useState("");
   const [tokenIngresado, setTokenIngresado] = useState("");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-
 
   const handleRecuperar = async () => {
     try {
@@ -47,7 +42,6 @@ function Login() {
         confirmButtonColor: "#3085d6",
         confirmButtonText: "Ingresar token"
       }).then(() => {
-        // cerrar modal de email y abrir modal de token
         setShowModal(false);
         setShowTokenModal(true);
       });
@@ -56,7 +50,6 @@ function Login() {
       Swal.fire("Error", err.message, "error");
     }
   };
-
 
   const handleValidarToken = async () => {
     try {
@@ -81,8 +74,6 @@ function Login() {
         setShowTokenModal(false);
         setTokenIngresado("");
         setEmailRecuperar("");
-
-
         navigate("/new-password", { state: { email: emailRecuperar, token: tokenTemp } });
       });
 
@@ -91,12 +82,10 @@ function Login() {
     }
   };
 
-
-
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/auth/login", {
@@ -105,73 +94,101 @@ function Login() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Credenciales inválidas");
+      if (!res.ok) {
+        throw new Error("Credenciales inválidas");
+      }
 
       const data = await res.json();
 
-      // Guardar token, rol y código del usuario actual
+      // Debug completo de la respuesta
+      console.log("📦 Respuesta completa del backend:", data);
+      console.log("📍 tienePerfilMedico recibido:", data.tienePerfilMedico, "| tipo:", typeof data.tienePerfilMedico);
+
+      // Guardar datos en localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("rol", data.rol);
       localStorage.setItem("codigoUsuario", data.codigo);
+      localStorage.setItem("nombreUsuario", data.nombre);
+      localStorage.setItem("apellidoUsuario", data.apellido);
 
-      // Lee usuarios existentes o crea un objeto vacío
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-      const citasExistentes = usuarios[data.codigo]?.citas || [];
+      console.log("✅ Usuario autenticado:", data.nombre);
+      console.log("Rol:", data.rol);
+      console.log("Código usuario:", data.codigo);
 
-      // Crea un objeto user sin sobrescribir citas existentes
-      const user = {
-        codigo: data.codigo ?? "",
-        nombre: data.nombre ?? "",
-        apellido: data.apellido ?? "",
-        dni: data.dni ?? "",
-        sexo: data.sexo ?? "",
-        email: data.email ?? "",
-        telefono: data.telefono ?? "",
-        rol: data.rol,
-        estado: data.estado ?? "Activo",
-        citas: citasExistentes,
-        especialidades: usuarios[data.codigo]?.especialidades || [],
-        turnos: usuarios[data.codigo]?.turnos || [],
-      };
+      // Mostrar mensaje de bienvenida
+      await Swal.fire({
+        icon: "success",
+        title: `¡Bienvenido, ${data.nombre}!`,
+        text: getRolMessage(data.rol, data.tienePerfilMedico),
+        timer: 2000,
+        showConfirmButton: false
+      });
 
-      // Guardar o actualizar usuario
-      usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-      switch (data.rol) {
-        case "ROLE_ADMIN":
-          window.location.href = "/dashboard-admin";
-          break;
-
-        case "ROLE_MEDICO": {
-          const tienePerfil = (user.especialidades?.length || 0) > 0 && (user.turnos?.length || 0) > 0;
-
-          if (!tienePerfil) {
-            window.location.href = "/crear-perfil-medico";
-          } else {
-            window.location.href = "/index-medico";
-          }
-          break;
-        }
-
-        case "ROLE_PACIENTE":
-          window.location.href = "/dashboard-paciente/inicio";
-          break;
-
-        default:
-          window.location.href = "/dashboard-paciente/inicio";
-          break;
-      }
-
+      // Redirección según el rol usando el flag del backend
+      redirectUser(data.rol, data.tienePerfilMedico);
 
     } catch (err) {
+      console.error("❌ Error en login:", err);
       setError(err.message);
-      console.error("Error en login:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error al iniciar sesión",
+        text: err.message
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Función auxiliar para obtener mensaje según rol
+  const getRolMessage = (rol, tienePerfilMedico) => {
+    switch (rol) {
+      case "ROLE_ADMIN":
+        return "Accediendo al panel de administración...";
+      case "ROLE_MEDICO":
+        return tienePerfilMedico 
+          ? "Accediendo a tu panel médico..." 
+          : "Completa tu perfil médico para comenzar...";
+      case "ROLE_PACIENTE":
+        return "Accediendo a tu perfil de paciente...";
+      default:
+        return "Accediendo al sistema...";
+    }
+  };
 
+  // Función auxiliar para redirección
+  const redirectUser = (rol, tienePerfilMedico) => {
+    // Convertir a booleano explícitamente para manejar strings "true"/"false"
+    const tienePerfil = tienePerfilMedico === true || tienePerfilMedico === "true";
+    
+    console.log("🔀 Redirigiendo con rol:", rol, "| tienePerfil:", tienePerfil);
+    
+    switch (rol) {
+      case "ROLE_ADMIN":
+        navigate("/dashboard-admin");
+        break;
 
+      case "ROLE_PACIENTE":
+        navigate("/dashboard-paciente/inicio");
+        break;
+
+      case "ROLE_MEDICO":
+        // ✅ Usamos el flag que ya viene del backend
+        if (tienePerfil) {
+          console.log("✅ Redirigiendo a index-medico");
+          navigate("/index-medico");
+        } else {
+          console.log("⚠️ Redirigiendo a crear-perfil-medico");
+          navigate("/crear-perfil-medico");
+        }
+        break;
+
+      default:
+        console.warn("⚠️ Rol no reconocido:", rol);
+        navigate("/dashboard-paciente/inicio");
+        break;
+    }
+  };
 
   return (
     <AuthLayout>
@@ -193,6 +210,7 @@ function Login() {
                 placeholder="Correo Electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </section>
 
@@ -207,6 +225,7 @@ function Login() {
                 placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </section>
 
@@ -225,12 +244,13 @@ function Login() {
             {/* Botón */}
             <section className="col-12 text-center">
               <Button
-                text="Ingresar"
+                text={isLoading ? "Ingresando..." : "Ingresar"}
                 type="submit"
+                disabled={isLoading}
               />
             </section>
+            
             {error && <p className="text-danger text-center mt-2">{error}</p>}
-
 
             {/* Registrate */}
             <section className="col-12 text-center mt-3">
@@ -291,8 +311,14 @@ function Login() {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => setShowTokenModal(false)}>Cancelar</button>
-          <button className="btn btn-primary" onClick={handleValidarToken} disabled={!tokenIngresado}>
+          <button className="btn btn-secondary" onClick={() => setShowTokenModal(false)}>
+            Cancelar
+          </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={handleValidarToken} 
+            disabled={!tokenIngresado}
+          >
             Validar
           </button>
         </Modal.Footer>

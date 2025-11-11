@@ -23,6 +23,35 @@ function CrearPerfilMedico() {
   };
 
 
+  useEffect(() => {
+  const codigoUsuario = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
+
+  fetch(`${API_BASE_URL}/perfil-medico/usuario/${codigoUsuario}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("No se pudo obtener el perfil médico");
+      return res.json();
+    })
+    .then((data) => {
+      console.log("Perfil médico existente:", data);
+      if (data.especialidades?.length > 0 && data.turnos?.length > 0) {
+        Swal.fire(
+          "Perfil ya existe",
+          "Ya tienes un perfil médico configurado. Serás redirigido a tu página principal.",
+          "info"
+        ).then(() => {
+          window.location.href = "/index-medico";
+        });
+      }
+    })
+    .catch((err) => {
+      console.error("Error al obtener perfil médico:", err);
+    });
+}, []);
+
+
   // Cargar especialidades y turnos desde el backend
   useEffect(() => {
     const token = localStorage.getItem("token");
