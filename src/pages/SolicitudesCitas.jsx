@@ -3,6 +3,8 @@ import { Table, Button, Card } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
 import EstadoBadge from "../components/EstadoBadge";
 import FiltroEstado from "../components/FiltroEstado";
+import API_BASE_URL from "../config";
+import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/colors.css";
 import "../css/TableHeader.css";
@@ -13,68 +15,84 @@ function SolicitudesCitas() {
   const [nombreMedico, setNombreMedico] = useState("Médico");
 
   const codigoMedico = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const cargarSolicitudes = () => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-      const medico = usuarios[codigoMedico];
-      if (!medico) return;
+    if (!codigoMedico || !token) {
+      console.warn("⚠️ Faltan datos del médico o token");
+      return;
+    }
 
-      const nombreCompleto = [medico.nombre, medico.apellido].filter(Boolean).join(" ");
-      setNombreMedico(nombreCompleto);
+    const cargarSolicitudes = async () => {
+      try {
+        console.log("🚀 Cargando citas del médico:", codigoMedico);
 
-      const nuevasSolicitudes = Object.values(usuarios).flatMap((u) =>
-        u.citas
-          ?.filter((c) => c.doctor === nombreCompleto)
-          .map((c) => ({
-            ...c,
-            paciente: [u.nombre, u.apellido].filter(Boolean).join(" "),
-            codigoPaciente: u.codigo,
-          })) || []
-      );
+        // Obtener perfil del médico
+        const resPerfilMedico = await fetch(`${API_BASE_URL}/users/${codigoMedico}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setSolicitudes(nuevasSolicitudes);
+        if (resPerfilMedico.ok) {
+          const perfilMedico = await resPerfilMedico.json();
+          const nombreCompleto = perfilMedico.nombreCompleto || [perfilMedico.nombre, perfilMedico.apellido].filter(Boolean).join(" ") || "Médico";
+          setNombreMedico(nombreCompleto);
+        }
+
+        // Obtener citas del médico
+        const resCitas = await fetch(`${API_BASE_URL}/appointments/medico/${codigoMedico}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!resCitas.ok) {
+          throw new Error(`Error al cargar citas: ${resCitas.status}`);
+        }
+
+        const citas = await resCitas.json();
+        console.log("✅ Citas del médico:", citas);
+
+        setSolicitudes(citas);
+      } catch (err) {
+        console.error("❌ Error al cargar solicitudes:", err);
+        Swal.fire("Error", "No se pudieron cargar las citas", "error");
+      }
     };
 
     cargarSolicitudes();
+  }, [codigoMedico, token]);
 
-    const handleStorageChange = (e) => {
-      if (e.key === "usuarios") cargarSolicitudes();
-    };
+  const actualizarEstado = async (idCita, nuevoEstado) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${idCita}/estado?estado=${nuevoEstado}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [codigoMedico]);
+      if (!res.ok) throw new Error("Error al actualizar estado");
 
-  const actualizarEstado = (codigoPaciente, idCita, nuevoEstado) => {
-    setSolicitudes((prev) =>
-      prev.map((s) =>
-        s.codigoPaciente === codigoPaciente && s.id === idCita
-          ? { ...s, estado: nuevoEstado }
-          : s
-      )
-    );
+      const citaActualizada = await res.json();
 
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const paciente = usuarios[codigoPaciente];
-    if (!paciente || !paciente.citas) return;
+      // Actualizar estado local
+      setSolicitudes((prev) =>
+        prev.map((s) => (s.id === idCita ? citaActualizada : s))
+      );
 
-    paciente.citas = paciente.citas.map((c) =>
-      c.id === idCita ? { ...c, estado: nuevoEstado } : c
-    );
-
-    usuarios[codigoPaciente] = paciente;
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-    
-    window.dispatchEvent(new Event("usuariosActualizados"));
+      Swal.fire(
+        "Estado actualizado",
+        `La cita ha sido ${nuevoEstado.toLowerCase()}`,
+        "success"
+      );
+    } catch (err) {
+      console.error("❌ Error al actualizar estado:", err);
+      Swal.fire("Error", "No se pudo actualizar el estado de la cita", "error");
+    }
   };
-
 
   const solicitudesFiltradas =
     filtro === "todas"
       ? solicitudes
-      : solicitudes.filter((s) => s.estado === filtro);
+      : solicitudes.filter((s) => s.estado === filtro.toUpperCase());
 
   return (
     <>
@@ -84,7 +102,7 @@ function SolicitudesCitas() {
         <h1 className="text-center mb-4">Solicitudes de Cita</h1>
 
         <FiltroEstado
-          opciones={["todas", "pendiente", "aceptada", "rechazada"]}
+          opciones={["todas", "PENDIENTE", "ACEPTADA", "RECHAZADA"]}
           activo={filtro}
           onChange={setFiltro}
         />
@@ -98,6 +116,7 @@ function SolicitudesCitas() {
                 <thead className="table-header-primary">
                   <tr>
                     <th>Paciente</th>
+                    <th>Especialidad</th>
                     <th>Fecha y Hora</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -106,47 +125,44 @@ function SolicitudesCitas() {
                 <tbody>
                   {solicitudesFiltradas.map((s) => (
                     <tr
-                      key={`${s.codigoPaciente}-${s.id}`}
+                      key={s.id}
                       className={
-                        s.estado === "pendiente"
+                        s.estado === "PENDIENTE"
                           ? "bg-warning bg-opacity-10"
-                          : s.estado === "aceptada"
-                            ? "bg-success bg-opacity-10"
-                            : "bg-danger bg-opacity-10"
+                          : s.estado === "ACEPTADA"
+                          ? "bg-success bg-opacity-10"
+                          : "bg-danger bg-opacity-10"
                       }
                     >
                       <td>
                         <i className="bi bi-person-circle text-primary me-2"></i>
-                        {s.paciente}
+                        {s.pacienteNombre || s.pacienteId}
                       </td>
+                      <td>{s.especialidadNombre || s.especialidadId}</td>
                       <td>
                         <i className="bi bi-calendar-event me-2 text-secondary"></i>
-                        {s.fecha}
+                        {s.fechaCita}
                         <br />
                         <i className="bi bi-clock me-2 text-secondary"></i>
-                        {s.hora}
+                        {s.horaCita}
                       </td>
                       <td className="estado-badge">
                         <EstadoBadge estado={s.estado} />
                       </td>
                       <td>
-                        {s.estado === "pendiente" ? (
+                        {s.estado === "PENDIENTE" ? (
                           <div className="d-flex gap-2 align-items-center">
                             <Button
                               size="sm"
                               variant="success"
-                              onClick={() =>
-                                actualizarEstado(s.codigoPaciente, s.id, "aceptada")
-                              }
+                              onClick={() => actualizarEstado(s.id, "ACEPTADA")}
                             >
                               <i className="bi bi-check-lg"></i> Aceptar
                             </Button>
                             <Button
                               size="sm"
                               variant="outline-danger"
-                              onClick={() =>
-                                actualizarEstado(s.codigoPaciente, s.id, "rechazada")
-                              }
+                              onClick={() => actualizarEstado(s.id, "RECHAZADA")}
                             >
                               <i className="bi bi-x-lg"></i> Rechazar
                             </Button>

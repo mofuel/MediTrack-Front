@@ -4,6 +4,7 @@ import SelectField from "../../components/SelectField";
 import Button from "../../components/Button";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
+import API_BASE_URL from "../../config";
 
 function VistaPacientePerfil() {
   const [perfil, setPerfil] = useState({
@@ -14,49 +15,84 @@ function VistaPacientePerfil() {
     dni: "",
     sexo: "",
   });
-
   const [editando, setEditando] = useState(false);
 
+  // 🔹 Cargar perfil desde el backend
   useEffect(() => {
-    const codigo = localStorage.getItem("codigoUsuario"); 
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    const userObj = usuarios[codigo];
+    const codigo = localStorage.getItem("codigoUsuario");
+    const token = localStorage.getItem("token");
 
-    if (userObj) {
-      setPerfil({
-        nombre: userObj.nombre || "",
-        apellido: userObj.apellido || "",
-        email: userObj.email || "",
-        telefono: userObj.telefono || "",
-        dni: userObj.dni || "",
-        sexo: userObj.sexo || "",
-      });
+    if (!codigo || !token) {
+      console.error("No se encontró token o código de usuario");
+      return;
     }
-  }, []);
 
+    fetch(`${API_BASE_URL}/users/${codigo}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al obtener el perfil");
+        return res.json();
+      })
+      .then((data) => {
+        setPerfil({
+          nombre: data.nombre || "",
+          apellido: data.apellido || "",
+          email: data.email || "",
+          telefono: data.telefono || "",
+          dni: data.dni || "",
+          sexo: data.sexo || "",
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire("Error", "No se pudo cargar el perfil", "error");
+      });
+  }, []); // ✅ No hay warning porque API_BASE_URL es constante (no cambia)
+
+  // 🔹 Actualizar valores del formulario
   const handleChange = (e) => {
     setPerfil({ ...perfil, [e.target.name]: e.target.value });
   };
 
-  const guardarCambios = (e) => {
+  // 🔹 Guardar cambios en el backend
+  const guardarCambios = async (e) => {
     e.preventDefault();
-
     const codigo = localStorage.getItem("codigoUsuario");
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    const token = localStorage.getItem("token");
 
-    // Actualizar el usuario dentro del objeto global
-    usuarios[codigo] = { ...usuarios[codigo], ...perfil };
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(perfil),
+      });
 
-    setEditando(false);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Error al actualizar");
+      }
 
-    Swal.fire({
-      title: "¡Perfil actualizado!",
-      text: "Tus datos han sido guardados correctamente ✅",
-      icon: "success",
-      confirmButtonText: "Aceptar",
-      confirmButtonColor: "#3085d6",
-    });
+      const data = await response.json();
+
+      Swal.fire({
+        title: "¡Perfil actualizado!",
+        text: "Tus datos han sido guardados correctamente ✅",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+      });
+
+      setPerfil(data);
+      setEditando(false);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
   };
 
   const opcionesSexo = [
@@ -70,67 +106,56 @@ function VistaPacientePerfil() {
       <div className="card shadow-sm">
         <div className="card-body">
           {editando ? (
-            <form>
+            <form onSubmit={guardarCambios}>
               <div className="row">
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Nombre:</label>
                   <InputField
                     type="text"
-                    id="nombre"
-                    placeholder="Nombre"
+                    name="nombre"
                     value={perfil.nombre}
                     onChange={handleChange}
-                    name="nombre"
                   />
                 </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Apellido:</label>
                   <InputField
                     type="text"
-                    id="apellido"
-                    placeholder="Apellido"
+                    name="apellido"
                     value={perfil.apellido}
                     onChange={handleChange}
-                    name="apellido"
                   />
                 </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Email:</label>
                   <InputField
                     type="email"
-                    id="email"
-                    placeholder="Email"
+                    name="email"
                     value={perfil.email}
                     onChange={handleChange}
-                    name="email"
                   />
                 </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Teléfono:</label>
                   <InputField
                     type="text"
-                    id="telefono"
-                    placeholder="Teléfono"
+                    name="telefono"
                     value={perfil.telefono}
                     onChange={handleChange}
-                    name="telefono"
                   />
                 </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label">DNI:</label>
                   <InputField
                     type="text"
-                    id="dni"
-                    placeholder="DNI"
+                    name="dni"
                     value={perfil.dni}
                     onChange={handleChange}
-                    name="dni"
                   />
                 </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Sexo:</label>
                   <SelectField
-                    id="sexo"
                     name="sexo"
                     value={perfil.sexo}
                     onChange={handleChange}
@@ -140,7 +165,7 @@ function VistaPacientePerfil() {
               </div>
 
               <div className="d-flex gap-2 mt-3">
-                <Button text="Guardar" onClick={guardarCambios} type="button" />
+                <Button text="Guardar" type="submit" />
                 <Button
                   text="Cancelar"
                   onClick={() => setEditando(false)}

@@ -10,6 +10,7 @@ import AuthLayout from "../layouts/AuthLayout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Modal, Form } from "react-bootstrap";
+import API_BASE_URL from "../config";
 
 function Login() {
   const [showModal, setShowModal] = useState(false);
@@ -25,7 +26,7 @@ function Login() {
 
   const handleRecuperar = async () => {
     try {
-      const res = await fetch("http://localhost:8080/password/request", {
+      const res = await fetch(`${API_BASE_URL}/password/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailRecuperar }),
@@ -53,7 +54,7 @@ function Login() {
 
   const handleValidarToken = async () => {
     try {
-      const res = await fetch("http://localhost:8080/password/validate", {
+      const res = await fetch(`${API_BASE_URL}/password/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -88,7 +89,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
