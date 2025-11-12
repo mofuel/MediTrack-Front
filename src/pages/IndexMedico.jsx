@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
 import EstadoBadge from "../components/EstadoBadge";
+import API_BASE_URL from "../config";
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/IndexMedico.css";
@@ -10,62 +12,72 @@ import "../css/colors.css";
 function IndexMedico() {
   const navigate = useNavigate();
   const codigoUsuario = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
 
   const [citasHoy, setCitasHoy] = useState([]);
   const [citasProximas, setCitasProximas] = useState([]);
   const [nombreMedico, setNombreMedico] = useState("Médico");
 
   useEffect(() => {
-    const cargarCitas = () => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-      const medico = usuarios[codigoUsuario];
-      if (!medico) return;
+    if (!codigoUsuario || !token) {
+      console.warn("⚠️ Faltan datos del médico o token");
+      return;
+    }
 
-      const nombreCompleto = [medico.nombre, medico.apellido].filter(Boolean).join(" ");
-      setNombreMedico(nombreCompleto);
+    const cargarCitas = async () => {
+      try {
+        console.log("🚀 Cargando citas del médico:", codigoUsuario);
 
-      const hoy = new Date();
-      const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}-${String(hoy.getDate()).padStart(2, "0")}`;
+        // Obtener perfil del médico
+        const resPerfilMedico = await fetch(`${API_BASE_URL}/users/${codigoUsuario}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const todasCitas = Object.values(usuarios).flatMap((u) =>
-        u.citas
-          ?.filter(
-            (c) =>
-              c.doctor?.toLowerCase().trim() === nombreCompleto.toLowerCase().trim()
+        if (resPerfilMedico.ok) {
+          const perfilMedico = await resPerfilMedico.json();
+          const nombreCompleto = perfilMedico.nombreCompleto || 
+                                [perfilMedico.nombre, perfilMedico.apellido].filter(Boolean).join(" ") || 
+                                "Médico";
+          setNombreMedico(nombreCompleto);
+        }
+
+        // Obtener citas del médico
+        const resCitas = await fetch(`${API_BASE_URL}/appointments/medico/${codigoUsuario}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!resCitas.ok) {
+          throw new Error(`Error al cargar citas: ${resCitas.status}`);
+        }
+
+        const citas = await resCitas.json();
+        console.log("✅ Citas del médico:", citas);
+
+        // Calcular fecha de hoy
+        const hoy = new Date();
+        const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+
+        // Filtrar citas de hoy
+        const citasDeHoy = citas.filter((c) => c.fechaCita === hoyString);
+        setCitasHoy(citasDeHoy);
+
+        // Filtrar y ordenar próximas citas
+        const proximas = citas
+          .filter((c) => c.fechaCita > hoyString)
+          .sort((a, b) => 
+            (a.fechaCita + "T" + a.horaCita).localeCompare(b.fechaCita + "T" + b.horaCita)
           )
-          .map((c) => ({
-            ...c,
-            pacienteNombre: [u.nombre, u.apellido].filter(Boolean).join(" "),
-            codigoPaciente: u.codigo,
-          })) || []
-      );
+          .slice(0, 5); // Mostrar solo las 5 próximas
 
-      setCitasHoy(todasCitas.filter((c) => c.fecha === hoyString));
-      setCitasProximas(
-        todasCitas
-          .filter((c) => c.fecha > hoyString)
-          .sort((a, b) => (a.fecha + "T" + a.hora).localeCompare(b.fecha + "T" + b.hora))
-      );
+        setCitasProximas(proximas);
+      } catch (err) {
+        console.error("❌ Error al cargar citas:", err);
+        Swal.fire("Error", "No se pudieron cargar las citas", "error");
+      }
     };
 
     cargarCitas();
-
-    const handleStorage = (e) => {
-      if (e.key === "usuarios") cargarCitas();
-    };
-    const handleCustomEvent = () => cargarCitas();
-
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener("usuariosActualizados", handleCustomEvent);
-
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("usuariosActualizados", handleCustomEvent);
-    };
-  }, [codigoUsuario]);
+  }, [codigoUsuario, token]);
 
   const accesos = [
     { text: "Solicitudes de Cita", path: "/solicitudes-citas", icon: "bi-calendar-check" },
@@ -75,12 +87,13 @@ function IndexMedico() {
   ];
 
   const getIconClass = (estado) => {
-    switch (estado) {
-      case "pendiente":
+    const estadoNormalizado = estado?.toUpperCase() || "";
+    switch (estadoNormalizado) {
+      case "PENDIENTE":
         return "bi-clock text-warning";
-      case "aceptada":
+      case "ACEPTADA":
         return "bi-check-circle-fill text-success";
-      case "rechazada":
+      case "RECHAZADA":
         return "bi-x-circle-fill text-danger";
       default:
         return "bi-question-circle text-secondary";
@@ -106,10 +119,15 @@ function IndexMedico() {
                     >
                       <i className={`bi ${getIconClass(c.estado)} fs-4 me-3`}></i>
                       <div className="flex-grow-1">
-                        <div className="fw-bold">{c.pacienteNombre}</div>
+                        <div className="fw-bold">{c.pacienteNombre || c.pacienteId}</div>
                         <small className="text-muted">
-                          {c.fecha} — {c.hora}
+                          {c.fechaCita} — {c.horaCita}
                         </small>
+                        <div>
+                          <small className="text-secondary">
+                            {c.especialidadNombre || c.especialidadId}
+                          </small>
+                        </div>
                       </div>
                       <EstadoBadge estado={c.estado} />
                     </div>
@@ -133,10 +151,15 @@ function IndexMedico() {
                     >
                       <i className={`bi ${getIconClass(c.estado)} fs-4 me-3`}></i>
                       <div className="flex-grow-1">
-                        <div className="fw-bold">{c.pacienteNombre}</div>
+                        <div className="fw-bold">{c.pacienteNombre || c.pacienteId}</div>
                         <small className="text-muted">
-                          {c.fecha} — {c.hora}
+                          {c.fechaCita} — {c.horaCita}
                         </small>
+                        <div>
+                          <small className="text-secondary">
+                            {c.especialidadNombre || c.especialidadId}
+                          </small>
+                        </div>
                       </div>
                       <EstadoBadge estado={c.estado} />
                     </div>

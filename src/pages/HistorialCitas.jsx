@@ -3,6 +3,8 @@ import { Table, Card, Form } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
 import EstadoBadge from "../components/EstadoBadge";
 import FiltroEstado from "../components/FiltroEstado";
+import API_BASE_URL from "../config";
+import Swal from "sweetalert2";
 import "../css/Colors.css";
 import "../css/TableHeader.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -13,42 +15,65 @@ function HistorialCitas() {
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [nombreMedico, setNombreMedico] = useState("Médico");
 
-  const codigoMedico = localStorage.getItem("codigoUsuario"); // médico logueado
+  const codigoMedico = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const cargarCitas = () => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-      const medico = usuarios[codigoMedico];
-      if (!medico) return;
+    if (!codigoMedico || !token) {
+      console.warn("⚠️ Falta token o código de médico");
+      return;
+    }
 
-      const nombreCompleto = [medico.nombre, medico.apellido].filter(Boolean).join(" ");
-      setNombreMedico(nombreCompleto);
+    const cargarCitas = async () => {
+      try {
+        console.log("📡 Cargando historial de citas del médico:", codigoMedico);
 
-      // Toma todas las citas asignadas a este médico
-      const citasMedico = Object.values(usuarios).flatMap((u) =>
-        u.citas
-          ?.filter((c) => c.doctor === nombreCompleto)
-          .map((c) => ({
-            ...c,
-            paciente: [u.nombre, u.apellido].filter(Boolean).join(" "),
-            codigoPaciente: u.codigo,
-          })) || []
-      );
+        // 🔹 Obtener datos del médico
+        const resPerfil = await fetch(`${API_BASE_URL}/users/${codigoMedico}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setCitas(citasMedico);
+        if (resPerfil.ok) {
+          const medico = await resPerfil.json();
+          const nombreCompleto =
+            medico.nombreCompleto ||
+            [medico.nombre, medico.apellido].filter(Boolean).join(" ") ||
+            "Médico";
+          setNombreMedico(nombreCompleto);
+        }
+
+        // 🔹 Obtener citas del médico
+        const resCitas = await fetch(`${API_BASE_URL}/appointments/medico/${codigoMedico}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!resCitas.ok) {
+          throw new Error(`Error al cargar citas: ${resCitas.status}`);
+        }
+
+        const data = await resCitas.json();
+        console.log("✅ Citas obtenidas:", data);
+
+        // 🔹 Adaptar formato a lo que usa tu tabla
+        const citasAdaptadas = data.map((c) => ({
+          id: c.id,
+          paciente: c.pacienteNombre || c.pacienteId,
+          fecha: c.fechaCita,
+          hora: c.horaCita,
+          estado: c.estado,
+        }));
+
+        setCitas(citasAdaptadas);
+      } catch (err) {
+        console.error("❌ Error al cargar citas:", err);
+        Swal.fire("Error", "No se pudo cargar el historial de citas", "error");
+      }
     };
 
     cargarCitas();
+  }, [codigoMedico, token]);
 
-    const handleStorageChange = (e) => {
-      if (e.key === "usuarios") cargarCitas();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [codigoMedico]);
-
-  // Filtrado por nombre y estado
+  // 🔹 Filtrado
   const citasFiltradas = citas
     .filter((c) =>
       c.paciente.toLowerCase().includes(filtroNombre.toLowerCase())
@@ -74,7 +99,7 @@ function HistorialCitas() {
         </Form>
 
         <FiltroEstado
-          opciones={["todos", "aceptada", "pendiente", "rechazada"]}
+          opciones={["todos", "ACEPTADA", "PENDIENTE", "RECHAZADA"]}
           activo={filtroEstado}
           onChange={setFiltroEstado}
         />
@@ -95,7 +120,7 @@ function HistorialCitas() {
                 </thead>
                 <tbody>
                   {citasFiltradas.map((c) => (
-                    <tr key={`${c.codigoPaciente}-${c.id}`}>
+                    <tr key={c.id}>
                       <td>
                         <i className="bi bi-person-circle text-primary me-2"></i>
                         {c.paciente}

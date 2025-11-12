@@ -1,19 +1,26 @@
 import { useState, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, Legend
 } from "recharts";
+import API_BASE_URL from "../../config";
 
 function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
-
   const [stats, setStats] = useState({
     pacientes: cantidadPacientes,
     doctores: cantidadDoctores,
-    citasHoy: 2, // valor por defecto
-    ingresos: 15400, // valor fijo
+    citasHoy: 0,
+    citasPendientes: 0,
+    citasAceptadas: 0,
+    citasRechazadas: 0,
+    ingresos: 15400,
   });
 
-  // Actualiza cuando cambian los props
+  const [citasPorMes, setCitasPorMes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     setStats(prev => ({
       ...prev,
@@ -22,27 +29,103 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
     }));
   }, [cantidadDoctores, cantidadPacientes]);
 
-  // Datos de gráficos ficticios
-  const [citasData] = useState([
-    { mes: "Enero", citas: 2 },
-    { mes: "Febrero", citas: 2 },
-    { mes: "Marzo", citas: 2 },
-    { mes: "Abril", citas: 2 },
-    { mes: "Mayo", citas: 2 },
-    { mes: "Junio", citas: 2 },
-    { mes: "Julio", citas: 2 },
-    { mes: "Agosto", citas: 2 },
-    { mes: "Septiembre", citas: 2 },
-    { mes: "Octubre", citas: 2 },
-    { mes: "Noviembre", citas: 2 },
-    { mes: "Diciembre", citas: 2 },
-  ]);
+  useEffect(() => {
+    if (!token) return;
 
-  const [estadoCitas] = useState([
-    { name: "Completadas", value: 2 },
-    { name: "Canceladas", value: 0 },
-    { name: "Pendientes", value: 0 },
-  ]);
+    const cargarEstadisticasCitas = async () => {
+      try {
+        setLoading(true);
+        console.log("📡 Obteniendo todas las citas...");
+
+        // Obtener todas las citas (endpoint para administrador)
+        const res = await fetch(`${API_BASE_URL}/appointments/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          console.warn("⚠️ No se pudieron obtener todas las citas, intentando con pendientes...");
+          // Si falla, al menos obtener las pendientes
+          const resPendientes = await fetch(`${API_BASE_URL}/appointments/pendientes`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          
+          if (resPendientes.ok) {
+            const citasPendientes = await resPendientes.json();
+            setStats(prev => ({
+              ...prev,
+              citasPendientes: citasPendientes.length,
+            }));
+          }
+          setLoading(false);
+          return;
+        }
+
+        const citas = await res.json();
+        console.log("✅ Citas obtenidas:", citas);
+
+        // Calcular fecha de hoy
+        const hoy = new Date();
+        const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+
+        // Filtrar citas del día actual
+        const citasDeHoy = citas.filter(c => c.fechaCita === hoyString);
+
+        // Contar por estado
+        const pendientes = citas.filter(c => c.estado === "PENDIENTE").length;
+        const aceptadas = citas.filter(c => c.estado === "ACEPTADA").length;
+        const rechazadas = citas.filter(c => c.estado === "RECHAZADA").length;
+
+        // Agrupar citas por mes
+        const citasPorMesMap = {};
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        
+        // Inicializar todos los meses en 0
+        meses.forEach(mes => {
+          citasPorMesMap[mes] = 0;
+        });
+
+        // Contar citas por mes
+        citas.forEach(cita => {
+          if (cita.fechaCita) {
+            const fecha = new Date(cita.fechaCita + "T00:00:00");
+            const mesIndex = fecha.getMonth();
+            const nombreMes = meses[mesIndex];
+            citasPorMesMap[nombreMes]++;
+          }
+        });
+
+        // Convertir a array para el gráfico
+        const citasPorMesArray = meses.map(mes => ({
+          mes,
+          citas: citasPorMesMap[mes]
+        }));
+
+        setStats(prev => ({
+          ...prev,
+          citasHoy: citasDeHoy.length,
+          citasPendientes: pendientes,
+          citasAceptadas: aceptadas,
+          citasRechazadas: rechazadas,
+        }));
+
+        setCitasPorMes(citasPorMesArray);
+        setLoading(false);
+      } catch (error) {
+        console.error("❌ Error al cargar estadísticas:", error);
+        setLoading(false);
+      }
+    };
+
+    cargarEstadisticasCitas();
+  }, [token]);
+
+  // Datos para el gráfico de torta (estado de citas)
+  const estadoCitas = [
+    { name: "Aceptadas", value: stats.citasAceptadas },
+    { name: "Rechazadas", value: stats.citasRechazadas },
+    { name: "Pendientes", value: stats.citasPendientes },
+  ].filter(item => item.value > 0); // Solo mostrar si hay datos
 
   const colores = ["#4caf50", "#f44336", "#ff9800"];
 
@@ -56,52 +139,69 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
         </div>
         <div className="stat-card">
           <h2>Citas Hoy</h2>
-          <p className="stat-number">{stats.citasHoy}</p>
+          <p className="stat-number">
+            {loading ? "..." : stats.citasHoy}
+          </p>
         </div>
         <div className="stat-card">
           <h2>Doctores Activos</h2>
           <p className="stat-number">{stats.doctores}</p>
         </div>
         <div className="stat-card">
-          <h2>Ingresos del Mes</h2>
-          <p className="stat-number">${stats.ingresos}</p>
+          <h2>Citas Pendientes</h2>
+          <p className="stat-number">
+            {loading ? "..." : stats.citasPendientes}
+          </p>
         </div>
       </div>
 
       {/* Gráficos */}
       <div className="reportes-grid">
         <div className="reporte-card">
-          <h3>Citas por Año</h3>
+          <h3>Citas por Mes (Año Actual)</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={citasData}>
+            <BarChart data={citasPorMes.length > 0 ? citasPorMes : []}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="mes" />
+              <XAxis dataKey="mes" angle={-45} textAnchor="end" height={80} />
               <YAxis />
               <Tooltip />
               <Bar dataKey="citas" fill="#1976d2" />
             </BarChart>
           </ResponsiveContainer>
+          {loading && <p className="text-center">Cargando datos...</p>}
+          {!loading && citasPorMes.every(m => m.citas === 0) && (
+            <p className="text-center text-muted">No hay citas registradas</p>
+          )}
         </div>
 
         <div className="reporte-card">
           <h3>Estado de las Citas</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={estadoCitas}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {estadoCitas.map((entry, index) => (
-                  <Cell key={index} fill={colores[index % colores.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+            {estadoCitas.length > 0 ? (
+              <PieChart>
+                <Pie
+                  data={estadoCitas}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={(entry) => `${entry.name}: ${entry.value}`}
+                >
+                  {estadoCitas.map((entry, index) => (
+                    <Cell key={index} fill={colores[index % colores.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            ) : (
+              <div className="d-flex align-items-center justify-content-center h-100">
+                <p className="text-muted">
+                  {loading ? "Cargando datos..." : "No hay citas registradas"}
+                </p>
+              </div>
+            )}
           </ResponsiveContainer>
         </div>
       </div>
