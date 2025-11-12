@@ -8,9 +8,15 @@ import Swal from "sweetalert2";
 function VistaPacienteCitas() {
   const codigoUsuario = localStorage.getItem("codigoUsuario");
   const token = localStorage.getItem("token");
+
   const [citas, setCitas] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [nuevaCita, setNuevaCita] = useState({ fechaCita: "", horaCita: "", especialidadId: "", medicoId: "" });
+  const [nuevaCita, setNuevaCita] = useState({
+    fechaCita: "",
+    horaCita: "",
+    especialidadId: "",
+    medicoId: "",
+  });
   const [medicosFiltrados, setMedicosFiltrados] = useState([]);
   const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState([]);
 
@@ -24,8 +30,7 @@ function VistaPacienteCitas() {
         if (!res.ok) throw new Error("Error al cargar citas");
         const data = await res.json();
         setCitas(data);
-      } catch (err) {
-        console.error(err);
+      } catch {
         Swal.fire("Error", "No se pudieron cargar las citas", "error");
       }
     };
@@ -42,19 +47,45 @@ function VistaPacienteCitas() {
         if (!res.ok) throw new Error("Error al cargar especialidades");
         const data = await res.json();
         setEspecialidadesDisponibles(data);
-      } catch (err) {
-        console.error(err);
+      } catch {
         Swal.fire("Error", "No se pudieron cargar las especialidades", "error");
       }
     };
     fetchEspecialidades();
   }, [token]);
 
-  // Filtrar médicos por especialidad
+  // Manejar cambios en los campos del formulario
   const handleChange = async (e) => {
     const { name, value } = e.target;
-    setNuevaCita(prev => ({ ...prev, [name]: value }));
 
+    // Validación de fecha pasada
+    if (name === "fechaCita") {
+      const hoy = new Date().toISOString().split("T")[0];
+      if (value < hoy) {
+        Swal.fire("Fecha inválida", "No puedes seleccionar una fecha pasada", "warning");
+        return;
+      }
+    }
+
+    // Validación de hora pasada (si la fecha es hoy)
+    if (name === "horaCita" && nuevaCita.fechaCita) {
+      const hoy = new Date().toISOString().split("T")[0];
+      if (nuevaCita.fechaCita === hoy) {
+        const horaActual = new Date().toLocaleTimeString("es-PE", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        if (value < horaActual) {
+          Swal.fire("Hora inválida", "No puedes seleccionar una hora pasada", "warning");
+          return;
+        }
+      }
+    }
+
+    setNuevaCita((prev) => ({ ...prev, [name]: value }));
+
+    // Cargar médicos si cambia la especialidad
     if (name === "especialidadId" && value) {
       try {
         const res = await fetch(`${API_BASE_URL}/perfil-medico/especialidad/${value}`, {
@@ -62,62 +93,68 @@ function VistaPacienteCitas() {
         });
         if (!res.ok) throw new Error("Error al cargar médicos");
         const data = await res.json();
-
-        console.log("Médicos filtrados por especialidad:", data); // <-- aquí ves la respuesta
         setMedicosFiltrados(data);
-        setNuevaCita(prev => ({ ...prev, medicoId: "" }));
-      } catch (err) {
-        console.error(err);
+        setNuevaCita((prev) => ({ ...prev, medicoId: "" }));
+      } catch {
         Swal.fire("Error", "No se pudieron cargar los médicos", "error");
       }
     }
   };
 
-
   // Guardar nueva cita
   const handleGuardarCita = async () => {
-  if (!nuevaCita.fechaCita || !nuevaCita.horaCita || !nuevaCita.especialidadId || !nuevaCita.medicoId) {
-    Swal.fire("Campos incompletos", "Completa todos los campos", "warning");
-    return;
-  }
+    if (!nuevaCita.fechaCita || !nuevaCita.horaCita || !nuevaCita.especialidadId || !nuevaCita.medicoId) {
+      Swal.fire("Campos incompletos", "Completa todos los campos", "warning");
+      return;
+    }
 
-  const dto = {
-    pacienteId: codigoUsuario,           // string, tu código de paciente
-    medicoId: nuevaCita.medicoId,        // string, código de usuario del médico
-    especialidadId: Number(nuevaCita.especialidadId), 
-    fechaCita: nuevaCita.fechaCita,
-    horaCita: nuevaCita.horaCita
+    const hoy = new Date().toISOString().split("T")[0];
+    if (nuevaCita.fechaCita < hoy) {
+      Swal.fire("Fecha inválida", "No puedes seleccionar una fecha pasada", "warning");
+      return;
+    }
+
+    if (nuevaCita.fechaCita === hoy) {
+      const horaActual = new Date().toLocaleTimeString("es-PE", {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      if (nuevaCita.horaCita < horaActual) {
+        Swal.fire("Hora inválida", "No puedes seleccionar una hora pasada", "warning");
+        return;
+      }
+    }
+
+    const dto = {
+      pacienteId: codigoUsuario,
+      medicoId: nuevaCita.medicoId,
+      especialidadId: Number(nuevaCita.especialidadId),
+      fechaCita: nuevaCita.fechaCita,
+      horaCita: nuevaCita.horaCita,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dto),
+      });
+
+      if (!res.ok) throw new Error("Error al guardar cita");
+      const nueva = await res.json();
+      setCitas((prev) => [...prev, nueva]);
+      setNuevaCita({ fechaCita: "", horaCita: "", especialidadId: "", medicoId: "" });
+      setMedicosFiltrados([]);
+      setShowModal(false);
+      Swal.fire("¡Cita agregada!", "Tu nueva cita ha sido guardada.", "success");
+    } catch {
+      Swal.fire("Error", "No se pudo guardar la cita", "error");
+    }
   };
-
-  console.log("DTO que se enviará al backend:", dto);
-  console.log("Token que se usará:", token);
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/appointments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(dto)
-    });
-
-    console.log("Respuesta del backend:", res);
-
-    if (!res.ok) throw new Error("Error al guardar cita");
-    const nueva = await res.json();
-    setCitas(prev => [...prev, nueva]);
-    setNuevaCita({ fechaCita: "", horaCita: "", especialidadId: "", medicoId: "" });
-    setMedicosFiltrados([]);
-    setShowModal(false);
-    Swal.fire("¡Cita agregada!", "Tu nueva cita ha sido guardada.", "success");
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "No se pudo guardar la cita", "error");
-  }
-};
-
-
 
   return (
     <div className="container mt-4">
@@ -139,16 +176,22 @@ function VistaPacienteCitas() {
           </thead>
           <tbody>
             {citas.length === 0 ? (
-              <tr><td colSpan={5} className="text-center">No tienes citas</td></tr>
-            ) : citas.map(c => (
-              <tr key={c.id}>
-                <td>{c.fechaCita}</td>
-                <td>{c.horaCita}</td>
-                <td>{c.especialidadNombre || c.especialidadId}</td>
-                <td>{c.medicoNombre || c.medicoId}</td>
-                <td><EstadoBadge estado={c.estado} /></td>
+              <tr>
+                <td colSpan={5} className="text-center">
+                  No tienes citas
+                </td>
               </tr>
-            ))}
+            ) : (
+              citas.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.fechaCita}</td>
+                  <td>{c.horaCita}</td>
+                  <td>{c.especialidadNombre || c.especialidadId}</td>
+                  <td>{c.medicoNombre || c.medicoId}</td>
+                  <td><EstadoBadge estado={c.estado} /></td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -182,8 +225,8 @@ function VistaPacienteCitas() {
                   onChange={handleChange}
                 >
                   <option value="">Seleccione especialidad</option>
-                  {especialidadesDisponibles.map((e, index) => (
-                    <option key={e.id ?? index} value={e.id}>
+                  {especialidadesDisponibles.map((e) => (
+                    <option key={e.id} value={e.id}>
                       {e.nombre}
                     </option>
                   ))}
@@ -195,14 +238,17 @@ function VistaPacienteCitas() {
                   value={nuevaCita.medicoId}
                   onChange={handleChange}
                 >
-                  <option value="">Seleccione doctor</option>
+                  <option value="">
+                    {medicosFiltrados.length === 0
+                      ? "Primero seleccione una especialidad"
+                      : "Seleccione doctor"}
+                  </option>
                   {medicosFiltrados.map((m) => (
                     <option key={m.codigoUsuario} value={m.codigoUsuario}>
                       {m.nombreCompleto}
                     </option>
                   ))}
                 </select>
-
               </div>
 
               <div className="modal-footer">

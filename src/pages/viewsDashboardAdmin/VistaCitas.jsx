@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
+import API_BASE_URL from "../../config";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Form } from "react-bootstrap";
 
@@ -7,90 +9,100 @@ function VistaCitas() {
   const [busqueda, setBusqueda] = useState("");
   const [orden, setOrden] = useState("asc");
   const [citas, setCitas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Usuarios y especialidades desde localStorage
-  const [usuarios, setUsuarios] = useState({});
+  const [pacientes, setPacientes] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
   const [medicosFiltrados, setMedicosFiltrados] = useState([]);
 
-  // Modal
+  const token = localStorage.getItem("token");
+
   const [showModal, setShowModal] = useState(false);
   const [modalTipo, setModalTipo] = useState("agregar");
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
 
-  // Formulario
   const [formPaciente, setFormPaciente] = useState("");
   const [formEspecialidad, setFormEspecialidad] = useState("");
   const [formDoctor, setFormDoctor] = useState("");
   const [formFecha, setFormFecha] = useState("");
   const [formHora, setFormHora] = useState("");
-  const [formEstado, setFormEstado] = useState("Pendiente");
+  const [formEstado, setFormEstado] = useState("PENDIENTE");
 
-  // Cargar datos iniciales
   useEffect(() => {
-    const dataUsuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-    setUsuarios(dataUsuarios);
+    if (!token) return;
+    cargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
-    const todasCitas = Object.values(dataUsuarios).flatMap(u =>
-      u.citas?.map(c => ({
-        ...c,
-        pacienteCodigo: u.codigo,
-        pacienteNombre: [u.nombre, u.apellido].filter(Boolean).join(" "),
-      })) || []
-    );
-    setCitas(todasCitas);
+  const cargarDatos = async () => {
+    try {
+      setLoading(true);
 
-    const especialidadesLS = JSON.parse(localStorage.getItem("especialidades")) || [];
-    setEspecialidades(especialidadesLS);
+      const resCitas = await fetch(`${API_BASE_URL}/appointments/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (resCitas.ok) setCitas(await resCitas.json());
 
-    const handleStorageChange = (e) => {
-      if (e.key === "usuarios") {
-        const data = JSON.parse(e.newValue) || {};
-        setUsuarios(data);
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+      const resPacientes = await fetch(`${API_BASE_URL}/users/pacientes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (resPacientes.ok) setPacientes(await resPacientes.json());
 
-  // Filtrar y ordenar
+      const resEspecialidades = await fetch(`${API_BASE_URL}/specialties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (resEspecialidades.ok)
+        setEspecialidades(await resEspecialidades.json());
+
+      setLoading(false);
+    } catch {
+      Swal.fire("Error", "No se pudieron cargar los datos", "error");
+      setLoading(false);
+    }
+  };
+
   const citasFiltradas = citas
-    .filter(c => c.pacienteNombre.toLowerCase().includes(busqueda.toLowerCase()))
+    .filter((c) =>
+      c.pacienteNombre?.toLowerCase().includes(busqueda.toLowerCase())
+    )
     .sort((a, b) =>
       orden === "asc"
-        ? a.pacienteNombre.localeCompare(b.pacienteNombre)
-        : b.pacienteNombre.localeCompare(a.pacienteNombre)
+        ? (a.pacienteNombre || "").localeCompare(b.pacienteNombre || "")
+        : (b.pacienteNombre || "").localeCompare(a.pacienteNombre || "")
     );
 
   const getBadgeClass = (estado) => {
-    switch (estado.toLowerCase()) {
-      case "aceptada":
-        return "bg-info text-dark";
-      case "pendiente":
+    const estadoUpper = estado?.toUpperCase() || "";
+    switch (estadoUpper) {
+      case "ACEPTADA":
+        return "bg-success";
+      case "PENDIENTE":
         return "bg-warning text-dark";
-      case "rechazada":
+      case "RECHAZADA":
         return "bg-danger";
       default:
         return "bg-secondary";
     }
   };
 
-  const handleAbrirModal = (tipo, cita = null) => {
+  const handleAbrirModal = async (tipo, cita = null) => {
     setModalTipo(tipo);
     setCitaSeleccionada(cita);
 
     if (tipo === "editar" && cita) {
-      const paciente = Object.values(usuarios).find(u =>
-        u.citas?.some(c => c.id === cita.id)
-      );
-      const citaReal = paciente?.citas.find(c => c.id === cita.id);
-      if (citaReal) {
-        setFormPaciente([paciente.nombre, paciente.apellido].filter(Boolean).join(" "));
-        setFormEspecialidad(citaReal.especialidad || "");
-        setFormDoctor(citaReal.doctor);
-        setFormFecha(citaReal.fecha);
-        setFormHora(citaReal.hora);
-        setFormEstado(citaReal.estado);
+      setFormPaciente(cita.pacienteId || "");
+      setFormEspecialidad(cita.especialidadId || "");
+      setFormDoctor(cita.medicoId || "");
+      setFormFecha(cita.fechaCita || "");
+      setFormHora(cita.horaCita || "");
+      setFormEstado(cita.estado || "PENDIENTE");
+
+      if (cita.especialidadId) {
+        const res = await fetch(
+          `${API_BASE_URL}/perfil-medico/especialidad/${cita.especialidadId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) setMedicosFiltrados(await res.json());
       }
     } else {
       setFormPaciente("");
@@ -98,87 +110,133 @@ function VistaCitas() {
       setFormDoctor("");
       setFormFecha("");
       setFormHora("");
-      setFormEstado("Pendiente");
+      setFormEstado("PENDIENTE");
+      setMedicosFiltrados([]);
     }
 
     setShowModal(true);
   };
 
-  // Manejo de cambio de campos
-  const handleChangeEspecialidad = (e) => {
+  const handleChangeEspecialidad = async (e) => {
     const value = e.target.value;
     setFormEspecialidad(value);
+    setFormDoctor("");
 
-    if (!value) {
-      setMedicosFiltrados([]);
-      setFormDoctor("");
+    if (!value) return setMedicosFiltrados([]);
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/perfil-medico/especialidad/${value}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!res.ok) throw new Error();
+      setMedicosFiltrados(await res.json());
+    } catch {
+      Swal.fire("Error", "No se pudieron cargar los médicos", "error");
+    }
+  };
+
+  const handleGuardarCita = async () => {
+    if (!formPaciente || !formEspecialidad || !formDoctor || !formFecha || !formHora) {
+      Swal.fire("Campos incompletos", "Completa todos los campos", "warning");
       return;
     }
 
-    const medicos = Object.values(usuarios).filter(
-      u => u.rol === "ROLE_MEDICO" && u.especialidades?.includes(Number(value))
-    );
-    setMedicosFiltrados(medicos);
-    setFormDoctor("");
-  };
+    // Validar fecha y hora futuras
+    const fechaHoraSeleccionada = new Date(`${formFecha}T${formHora}`);
+    const ahora = new Date();
+    if (fechaHoraSeleccionada <= ahora) {
+      Swal.fire("Fecha inválida", "Debe seleccionar una fecha y hora futuras", "warning");
+      return;
+    }
 
-  // Guardar cita
-  const handleGuardarCita = () => {
-    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || {};
-    let nuevaCita = {
-      id: modalTipo === "agregar" ? Date.now() : citaSeleccionada.id,
-      doctor: formDoctor,
-      especialidad: Number(formEspecialidad),
-      fecha: formFecha,
-      hora: formHora,
+    const dto = {
+      pacienteId: formPaciente,
+      medicoId: formDoctor,
+      especialidadId: Number(formEspecialidad),
+      fechaCita: formFecha,
+      horaCita: formHora,
       estado: formEstado,
     };
 
-    if (modalTipo === "agregar") {
-      const paciente = Object.values(usuariosLS).find(
-        u => [u.nombre, u.apellido].filter(Boolean).join(" ") === formPaciente
-      );
-      if (!paciente) {
-        alert("Paciente no encontrado");
-        return;
+    try {
+      if (modalTipo === "agregar") {
+        const res = await fetch(`${API_BASE_URL}/appointments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dto),
+        });
+
+        if (!res.ok) throw new Error();
+        const nuevaCita = await res.json();
+        setCitas((prev) => [...prev, nuevaCita]);
+        Swal.fire("¡Cita creada!", "La cita ha sido creada exitosamente", "success");
+      } else {
+        const res = await fetch(`${API_BASE_URL}/appointments/${citaSeleccionada.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dto),
+        });
+
+        if (!res.ok) throw new Error();
+        const citaActualizada = await res.json();
+        setCitas((prev) =>
+          prev.map((c) => (c.id === citaSeleccionada.id ? citaActualizada : c))
+        );
+        Swal.fire("¡Cita actualizada!", "La cita ha sido actualizada exitosamente", "success");
       }
-      paciente.citas = paciente.citas || [];
-      paciente.citas.push(nuevaCita);
-    } else {
-      const paciente = Object.values(usuariosLS).find(u =>
-        u.citas?.some(c => c.id === citaSeleccionada.id)
-      );
-      if (!paciente) return;
-      paciente.citas = paciente.citas.map(c =>
-        c.id === citaSeleccionada.id ? { ...c, ...nuevaCita } : c
-      );
+
+      setShowModal(false);
+    } catch {
+      Swal.fire("Error", "No se pudo guardar la cita", "error");
     }
-
-    localStorage.setItem("usuarios", JSON.stringify(usuariosLS));
-
-    const todasCitas = Object.values(usuariosLS).flatMap(u =>
-      u.citas?.map(c => ({
-        ...c,
-        pacienteCodigo: u.codigo,
-        pacienteNombre: [u.nombre, u.apellido].filter(Boolean).join(" "),
-      })) || []
-    );
-    setCitas(todasCitas);
-
-    setShowModal(false);
   };
 
-  // Eliminar cita
-  const handleEliminarCita = (citaId) => {
-    if (!window.confirm("¿Seguro de eliminar esta cita?")) return;
-
-    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || {};
-    Object.values(usuariosLS).forEach(u => {
-      u.citas = u.citas?.filter(c => c.id !== citaId) || [];
+  const handleEliminarCita = async (citaId) => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción no se puede deshacer",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
     });
-    localStorage.setItem("usuarios", JSON.stringify(usuariosLS));
-    setCitas(prev => prev.filter(c => c.id !== citaId));
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${citaId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error();
+      setCitas((prev) => prev.filter((c) => c.id !== citaId));
+      Swal.fire("¡Eliminada!", "La cita ha sido eliminada", "success");
+    } catch {
+      Swal.fire("Error", "No se pudo eliminar la cita", "error");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="container mt-4 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const fechaActual = new Date().toISOString().split("T")[0];
 
   return (
     <div className="container mt-4">
@@ -225,34 +283,42 @@ function VistaCitas() {
             </tr>
           </thead>
           <tbody>
-            {citasFiltradas.map((cita) => (
-              <tr key={cita.id}>
-                <td>{cita.pacienteNombre}</td>
-                <td>{especialidades.find(e => e.id === cita.especialidad)?.nombre}</td>
-                <td>{cita.doctor}</td>
-                <td>{cita.fecha}</td>
-                <td>{cita.hora}</td>
-                <td>
-                  <span className={`badge ${getBadgeClass(cita.estado)}`}>
-                    {cita.estado}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-outline-primary me-2"
-                    onClick={() => handleAbrirModal("editar", cita)}
-                  >
-                    <i className="bi bi-pencil-square"></i> Editar
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => handleEliminarCita(cita.id)}
-                  >
-                    <i className="bi bi-trash"></i> Eliminar
-                  </button>
+            {citasFiltradas.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="text-center">
+                  No hay citas registradas
                 </td>
               </tr>
-            ))}
+            ) : (
+              citasFiltradas.map((cita) => (
+                <tr key={cita.id}>
+                  <td>{cita.pacienteNombre || cita.pacienteId}</td>
+                  <td>{cita.especialidadNombre || cita.especialidadId}</td>
+                  <td>{cita.medicoNombre || cita.medicoId}</td>
+                  <td>{cita.fechaCita}</td>
+                  <td>{cita.horaCita}</td>
+                  <td>
+                    <span className={`badge ${getBadgeClass(cita.estado)}`}>
+                      {cita.estado}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary me-2"
+                      onClick={() => handleAbrirModal("editar", cita)}
+                    >
+                      <i className="bi bi-pencil-square"></i> Editar
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleEliminarCita(cita.id)}
+                    >
+                      <i className="bi bi-trash"></i> Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -260,30 +326,27 @@ function VistaCitas() {
       {/* Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>{modalTipo === "agregar" ? "Agregar Cita" : "Editar Cita"}</Modal.Title>
+          <Modal.Title>
+            {modalTipo === "agregar" ? "Agregar Cita" : "Editar Cita"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             {/* Paciente */}
             <Form.Group className="mb-2">
               <Form.Label>Paciente</Form.Label>
-              {modalTipo === "agregar" ? (
-                <Form.Select
-                  value={formPaciente}
-                  onChange={(e) => setFormPaciente(e.target.value)}
-                >
-                  <option value="">Seleccione paciente</option>
-                  {Object.values(usuarios)
-                    .filter(u => u.rol === "ROLE_PACIENTE")
-                    .map(p => (
-                      <option key={p.codigo} value={[p.nombre, p.apellido].join(" ")}>
-                        {[p.nombre, p.apellido].join(" ")}
-                      </option>
-                    ))}
-                </Form.Select>
-              ) : (
-                <Form.Control type="text" value={formPaciente} disabled />
-              )}
+              <Form.Select
+                value={formPaciente}
+                onChange={(e) => setFormPaciente(e.target.value)}
+                disabled={modalTipo === "editar"}
+              >
+                <option value="">Seleccione paciente</option>
+                {pacientes.map((p) => (
+                  <option key={p.codigo} value={p.codigo}>
+                    {p.nombreCompleto || `${p.nombre} ${p.apellido}`}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
 
             {/* Especialidad */}
@@ -294,8 +357,10 @@ function VistaCitas() {
                 onChange={handleChangeEspecialidad}
               >
                 <option value="">Seleccione especialidad</option>
-                {especialidades.map(e => (
-                  <option key={e.id} value={e.id}>{e.nombre}</option>
+                {especialidades.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.nombre}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
@@ -306,25 +371,33 @@ function VistaCitas() {
               <Form.Select
                 value={formDoctor}
                 onChange={(e) => setFormDoctor(e.target.value)}
+                disabled={medicosFiltrados.length === 0}
               >
-                <option value="">Seleccione doctor</option>
-                {medicosFiltrados.map(m => (
-                  <option key={m.codigo} value={`${m.nombre} ${m.apellido}`}>
-                    {m.nombre} {m.apellido}
+                <option value="">
+                  {medicosFiltrados.length === 0
+                    ? "Primero seleccione una especialidad"
+                    : "Seleccione doctor"}
+                </option>
+                {medicosFiltrados.map((m) => (
+                  <option key={m.codigoUsuario} value={m.codigoUsuario}>
+                    {m.nombreCompleto}
                   </option>
                 ))}
               </Form.Select>
             </Form.Group>
 
-            {/* Fecha y Hora */}
+            {/* Fecha */}
             <Form.Group className="mb-2">
               <Form.Label>Fecha</Form.Label>
               <Form.Control
                 type="date"
+                min={fechaActual}
                 value={formFecha}
                 onChange={(e) => setFormFecha(e.target.value)}
               />
             </Form.Group>
+
+            {/* Hora */}
             <Form.Group className="mb-2">
               <Form.Label>Hora</Form.Label>
               <Form.Control
@@ -341,15 +414,18 @@ function VistaCitas() {
                 value={formEstado}
                 onChange={(e) => setFormEstado(e.target.value)}
               >
-                <option>Aceptada</option>
-                <option>Pendiente</option>
-                <option>Rechazada</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="ACEPTADA">Aceptada</option>
+                <option value="RECHAZADA">Rechazada</option>
               </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowModal(false)}
+          >
             Cancelar
           </button>
           <button className="btn btn-primary" onClick={handleGuardarCita}>
