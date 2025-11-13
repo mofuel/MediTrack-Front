@@ -6,7 +6,7 @@ import FiltroEstado from "../components/FiltroEstado";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../css/colors.css";
+import "../css/Colors.css";
 import "../css/TableHeader.css";
 
 function SolicitudesCitas() {
