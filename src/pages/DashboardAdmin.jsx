@@ -5,7 +5,7 @@ import '../css/Colors.css';
 import logo from '../assets/logg.png';
 import API_BASE_URL from '../config';
 
-import VistaDashboard from "./viewsDashboardAdmin/VistaDashboard";
+import VistaDashboard from "./viewsDashboardAdmin/VistaDashBoard";
 import VistaCitas from "./viewsDashboardAdmin/VistaCitas";
 import VistaDoctores from "./viewsDashboardAdmin/VistaDoctores";
 import VistaReportes from "./viewsDashboardAdmin/VistaReportes";
