@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Dash.css';
-import '../css/colors.css';
+import '../css/Colors.css';
 import logo from '../assets/logg.png';
 import API_BASE_URL from '../config';
 

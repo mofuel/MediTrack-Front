@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/IndexMedico.css";
-import "../css/colors.css";
+import "../css/Colors.css";
 
 function IndexMedico() {
   const navigate = useNavigate();
