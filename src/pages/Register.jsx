@@ -78,6 +78,10 @@ function RegistroForm() {
             localStorage.setItem("token", data.token);
             localStorage.setItem("rol", data.rol);
             localStorage.setItem("codigoUsuario", data.codigo);
+            localStorage.setItem("nombreUsuario", data.nombre);
+            localStorage.setItem("apellidoUsuario", data.apellido);
+            
+
 
             // ✅ Leer o crear estructura de usuarios
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
