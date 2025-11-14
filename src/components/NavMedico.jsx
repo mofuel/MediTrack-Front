@@ -4,8 +4,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/NavMedico.css";
 import logoMedico from "../assets/logg.png";
 import { Link, useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config";
 
-const API_BASE_URL = "http://localhost:8080/api"; // Ajusta si es necesario
 
 function NavMedico() {
   const navigate = useNavigate();
