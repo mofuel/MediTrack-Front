@@ -1,6 +1,7 @@
 import { useState } from "react";
 import '../css/Register.css';
 import '../css/AuthLayout.css';
+import API_BASE_URL from "../config";
 import Swal from 'sweetalert2';
 import InputField from "../components/InputField";
 import Button from "../components/Button";
@@ -54,11 +55,12 @@ function RegistroForm() {
         }
 
         try {
-            const resp = await fetch("http://localhost:8080/api/users/register", {
+            const resp = await fetch(`${API_BASE_URL}/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
+
 
             if (!resp.ok) {
                 const text = await resp.text();
