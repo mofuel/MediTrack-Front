@@ -20,13 +20,13 @@ function IndexMedico() {
 
   useEffect(() => {
     if (!codigoUsuario || !token) {
-      console.warn("⚠️ Faltan datos del médico o token");
+      console.warn("Faltan datos del médico o token");
       return;
     }
 
     const cargarCitas = async () => {
       try {
-        console.log("🚀 Cargando citas del médico:", codigoUsuario);
+        console.log("Cargando citas del médico:", codigoUsuario);
 
         // Obtener perfil del médico
         const resPerfilMedico = await fetch(`${API_BASE_URL}/users/${codigoUsuario}`, {
@@ -41,7 +41,6 @@ function IndexMedico() {
           setNombreMedico(nombreCompleto);
         }
 
-        // Obtener citas del médico
         const resCitas = await fetch(`${API_BASE_URL}/appointments/medico/${codigoUsuario}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -51,27 +50,24 @@ function IndexMedico() {
         }
 
         const citas = await resCitas.json();
-        console.log("✅ Citas del médico:", citas);
+        console.log("Citas del médico:", citas);
 
-        // Calcular fecha de hoy
         const hoy = new Date();
         const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 
-        // Filtrar citas de hoy
         const citasDeHoy = citas.filter((c) => c.fechaCita === hoyString);
         setCitasHoy(citasDeHoy);
 
-        // Filtrar y ordenar próximas citas
         const proximas = citas
           .filter((c) => c.fechaCita > hoyString)
           .sort((a, b) => 
             (a.fechaCita + "T" + a.horaCita).localeCompare(b.fechaCita + "T" + b.horaCita)
           )
-          .slice(0, 5); // Mostrar solo las 5 próximas
+          .slice(0, 5); 
 
         setCitasProximas(proximas);
       } catch (err) {
-        console.error("❌ Error al cargar citas:", err);
+        console.error("Error al cargar citas:", err);
         Swal.fire("Error", "No se pudieron cargar las citas", "error");
       }
     };

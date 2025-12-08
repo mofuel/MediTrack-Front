@@ -6,10 +6,27 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 function VistaEspecialidad() {
   const [especialidades, setEspecialidades] = useState([]);
-  const token = localStorage.getItem("token"); // 🔹 Obtener token
+  const token = localStorage.getItem("token");
 
-  // Cargar especialidades desde la API
   useEffect(() => {
+    const cargarEspecialidades = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/specialties`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error("Error al obtener especialidades");
+        const data = await response.json();
+        setEspecialidades(data);
+      } catch (error) {
+        console.error("Error al cargar especialidades:", error);
+        Swal.fire("Error", "No se pudieron cargar las especialidades", "error");
+      }
+    };
+
+    cargarEspecialidades();
+  }, [token]);
+
+
   const cargarEspecialidades = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/specialties`, {
@@ -24,25 +41,6 @@ function VistaEspecialidad() {
     }
   };
 
-  cargarEspecialidades();
-}, [token]);
-
-
-  const cargarEspecialidades = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/specialties`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Error al obtener especialidades");
-      const data = await response.json();
-      setEspecialidades(data);
-    } catch (error) {
-      console.error("Error al cargar especialidades:", error);
-      Swal.fire("Error", "No se pudieron cargar las especialidades", "error");
-    }
-  };
-
-  // 🔹 Agregar especialidad
   const handleAgregarEspecialidad = async () => {
     const { value: nombre } = await Swal.fire({
       title: "Nueva Especialidad",
@@ -66,7 +64,7 @@ function VistaEspecialidad() {
 
       if (!response.ok) throw new Error("Error al crear especialidad");
 
-      Swal.fire("✅ Agregado", "La especialidad fue registrada correctamente", "success");
+      Swal.fire("Agregado", "La especialidad fue registrada correctamente", "success");
       cargarEspecialidades();
     } catch (error) {
       console.error("Error al agregar especialidad:", error);
@@ -74,7 +72,6 @@ function VistaEspecialidad() {
     }
   };
 
-  // 🔹 Editar especialidad
   const handleEditar = async (esp) => {
     const { value: nuevoNombre } = await Swal.fire({
       title: "Editar Especialidad",
@@ -98,7 +95,7 @@ function VistaEspecialidad() {
 
       if (!response.ok) throw new Error("Error al actualizar especialidad");
 
-      Swal.fire("✅ Actualizado", "La especialidad fue modificada", "success");
+      Swal.fire("Actualizado", "La especialidad fue modificada", "success");
       cargarEspecialidades();
     } catch (error) {
       console.error("Error al editar especialidad:", error);
@@ -106,7 +103,6 @@ function VistaEspecialidad() {
     }
   };
 
-  // 🔹 Eliminar especialidad
   const handleEliminar = async (id) => {
     const result = await Swal.fire({
       title: "¿Eliminar especialidad?",
@@ -127,7 +123,7 @@ function VistaEspecialidad() {
 
       if (!response.ok) throw new Error("Error al eliminar especialidad");
 
-      Swal.fire("✅ Eliminado", "La especialidad fue eliminada", "success");
+      Swal.fire("Eliminado", "La especialidad fue eliminada", "success");
       cargarEspecialidades();
     } catch (error) {
       console.error("Error al eliminar especialidad:", error);
@@ -149,7 +145,7 @@ function VistaEspecialidad() {
         <table className="table table-striped table-hover table-bordered align-middle">
           <thead className="table-primary">
             <tr>
-              <th>ID</th>
+              <th>Número</th>
               <th>Nombre</th>
               <th>Acciones</th>
             </tr>
@@ -162,9 +158,10 @@ function VistaEspecialidad() {
                 </td>
               </tr>
             ) : (
-              especialidades.map((esp) => (
+              especialidades.map((esp, index) => (
                 <tr key={esp.id}>
-                  <td>{esp.id}</td>
+                  {/* Secuencia consecutiva */}
+                  <td>{index + 1}</td>
                   <td>{esp.nombre}</td>
                   <td>
                     <button
@@ -186,6 +183,7 @@ function VistaEspecialidad() {
               ))
             )}
           </tbody>
+
         </table>
       </div>
     </div>

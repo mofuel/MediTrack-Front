@@ -30,7 +30,6 @@ function RegistroForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 🔸 Validar campos obligatorios
         const camposVacios = Object.entries(form)
             .filter(([, valor]) => !valor)
             .map(([nombre]) => nombre);
@@ -44,7 +43,6 @@ function RegistroForm() {
             return;
         }
 
-        // 🔸 Validar contraseñas
         if (form.password !== form.confirmPassword) {
             Swal.fire({
                 icon: 'error',
@@ -74,7 +72,6 @@ function RegistroForm() {
 
             const data = await resp.json();
 
-            // ✅ Guardar token, rol y código del usuario actual
             localStorage.setItem("token", data.token);
             localStorage.setItem("rol", data.rol);
             localStorage.setItem("codigoUsuario", data.codigo);
@@ -83,7 +80,6 @@ function RegistroForm() {
             
 
 
-            // ✅ Leer o crear estructura de usuarios
             const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
             const citasExistentes = usuarios[data.codigo]?.citas || [];
 
@@ -105,7 +101,6 @@ function RegistroForm() {
             usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
             localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
-            // ✅ Mostrar confirmación y redirigir según el rol
             Swal.fire({
                 icon: 'success',
                 title: 'Registro exitoso',
@@ -133,7 +128,6 @@ function RegistroForm() {
                 }
             });
 
-            // ✅ Limpiar formulario
             setForm({
                 nombre: "",
                 apellido: "",

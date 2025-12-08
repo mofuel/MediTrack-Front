@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Card } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
-import EstadoBadge from "../components/EstadoBadge";
 import FiltroEstado from "../components/FiltroEstado";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
@@ -17,16 +16,29 @@ function SolicitudesCitas() {
   const codigoMedico = localStorage.getItem("codigoUsuario");
   const token = localStorage.getItem("token");
 
+  // 🔹 Función para definir el color del badge según el estado
+  const getBadgeClass = (estado) => {
+    const estadoUpper = estado?.toUpperCase() || "";
+    switch (estadoUpper) {
+      case "ACEPTADA":
+        return "badge bg-success";
+      case "PENDIENTE":
+        return "badge bg-warning text-dark";
+      case "RECHAZADA":
+        return "badge bg-danger";
+      default:
+        return "badge bg-secondary";
+    }
+  };
+
   useEffect(() => {
     if (!codigoMedico || !token) {
-      console.warn("⚠️ Faltan datos del médico o token");
+      console.warn("Faltan datos del médico o token");
       return;
     }
 
     const cargarSolicitudes = async () => {
       try {
-        console.log("🚀 Cargando citas del médico:", codigoMedico);
-
         // Obtener perfil del médico
         const resPerfilMedico = await fetch(`${API_BASE_URL}/users/${codigoMedico}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -34,7 +46,10 @@ function SolicitudesCitas() {
 
         if (resPerfilMedico.ok) {
           const perfilMedico = await resPerfilMedico.json();
-          const nombreCompleto = perfilMedico.nombreCompleto || [perfilMedico.nombre, perfilMedico.apellido].filter(Boolean).join(" ") || "Médico";
+          const nombreCompleto =
+            perfilMedico.nombreCompleto ||
+            [perfilMedico.nombre, perfilMedico.apellido].filter(Boolean).join(" ") ||
+            "Médico";
           setNombreMedico(nombreCompleto);
         }
 
@@ -43,16 +58,12 @@ function SolicitudesCitas() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!resCitas.ok) {
-          throw new Error(`Error al cargar citas: ${resCitas.status}`);
-        }
+        if (!resCitas.ok) throw new Error(`Error al cargar citas: ${resCitas.status}`);
 
         const citas = await resCitas.json();
-        console.log("✅ Citas del médico:", citas);
-
         setSolicitudes(citas);
       } catch (err) {
-        console.error("❌ Error al cargar solicitudes:", err);
+        console.error("Error al cargar solicitudes:", err);
         Swal.fire("Error", "No se pudieron cargar las citas", "error");
       }
     };
@@ -60,20 +71,21 @@ function SolicitudesCitas() {
     cargarSolicitudes();
   }, [codigoMedico, token]);
 
+  // 🔹 Función para actualizar el estado de la cita
   const actualizarEstado = async (idCita, nuevoEstado) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/appointments/${idCita}/estado?estado=${nuevoEstado}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/appointments/${idCita}/estado?estado=${nuevoEstado}`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) throw new Error("Error al actualizar estado");
 
       const citaActualizada = await res.json();
 
-      // Actualizar estado local
       setSolicitudes((prev) =>
         prev.map((s) => (s.id === idCita ? citaActualizada : s))
       );
@@ -84,7 +96,7 @@ function SolicitudesCitas() {
         "success"
       );
     } catch (err) {
-      console.error("❌ Error al actualizar estado:", err);
+      console.error("Error al actualizar estado:", err);
       Swal.fire("Error", "No se pudo actualizar el estado de la cita", "error");
     }
   };
@@ -131,7 +143,9 @@ function SolicitudesCitas() {
                           ? "bg-warning bg-opacity-10"
                           : s.estado === "ACEPTADA"
                           ? "bg-success bg-opacity-10"
-                          : "bg-danger bg-opacity-10"
+                          : s.estado === "RECHAZADA"
+                          ? "bg-danger bg-opacity-10"
+                          : ""
                       }
                     >
                       <td>
@@ -146,8 +160,8 @@ function SolicitudesCitas() {
                         <i className="bi bi-clock me-2 text-secondary"></i>
                         {s.horaCita}
                       </td>
-                      <td className="estado-badge">
-                        <EstadoBadge estado={s.estado} />
+                      <td>
+                        <span className={getBadgeClass(s.estado)}>{s.estado}</span>
                       </td>
                       <td>
                         {s.estado === "PENDIENTE" ? (

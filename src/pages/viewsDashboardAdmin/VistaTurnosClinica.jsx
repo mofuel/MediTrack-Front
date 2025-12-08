@@ -18,7 +18,6 @@ function VistaTurnosClinica() {
 
   const token = localStorage.getItem("token");
 
-  // ✅ Cargar turnos desde el backend
   useEffect(() => {
     const fetchTurnos = async () => {
       try {
@@ -30,9 +29,8 @@ function VistaTurnosClinica() {
 
         const data = await response.json();
         setTurnos(data);
-        console.log("✅ Turnos cargados:", data);
       } catch (error) {
-        console.error("❌ Error al cargar turnos:", error);
+        console.error("Error al cargar turnos:", error);
         Swal.fire("Error", "No se pudieron cargar los turnos", "error");
       }
     };
@@ -40,7 +38,6 @@ function VistaTurnosClinica() {
     fetchTurnos();
   }, [token]);
 
-  // ✅ Abrir modal (nuevo o edición)
   const abrirModal = (turno = null) => {
     if (turno) {
       setEditarTurno(turno.id);
@@ -58,7 +55,6 @@ function VistaTurnosClinica() {
 
   const cerrarModal = () => setShowModal(false);
 
-  // ✅ Guardar (crear o editar)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -71,7 +67,6 @@ function VistaTurnosClinica() {
       let response;
 
       if (editarTurno) {
-        // 🔄 Actualizar
         response = await fetch(`${API_BASE_URL}/turnos/${editarTurno}`, {
           method: "PUT",
           headers: {
@@ -81,7 +76,6 @@ function VistaTurnosClinica() {
           body: JSON.stringify(payload),
         });
       } else {
-        // ➕ Crear nuevo
         response = await fetch(`${API_BASE_URL}/turnos`, {
           method: "POST",
           headers: {
@@ -105,7 +99,6 @@ function VistaTurnosClinica() {
         showConfirmButton: false,
       });
 
-      // 🔄 Recargar lista
       const updated = await fetch(`${API_BASE_URL}/turnos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -113,12 +106,11 @@ function VistaTurnosClinica() {
       setTurnos(data);
       cerrarModal();
     } catch (error) {
-      console.error("❌ Error al guardar turno:", error);
+      console.error("Error al guardar turno:", error);
       Swal.fire("Error", error.message || "No se pudo guardar el turno", "error");
     }
   };
 
-  // 🗑️ Eliminar turno
   const handleEliminar = async (id) => {
     const confirmacion = await Swal.fire({
       title: "¿Eliminar turno?",
@@ -147,17 +139,16 @@ function VistaTurnosClinica() {
       Swal.fire({
         icon: "success",
         title: "Eliminado",
-        text: "✅ Turno eliminado correctamente",
+        text: "Turno eliminado correctamente",
         timer: 1800,
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("❌ Error al eliminar turno:", error);
+      console.error("Error al eliminar turno:", error);
       Swal.fire("Error", error.message || "No se pudo eliminar el turno", "error");
     }
   };
 
-  // 🔍 Filtro y orden
   const turnosFiltrados = turnos
     .filter((t) => t.nombre?.toLowerCase().includes(busqueda.toLowerCase()))
     .sort((a, b) =>
@@ -173,7 +164,7 @@ function VistaTurnosClinica() {
         <Button text="Agregar Turno" onClick={() => abrirModal()} />
       </div>
 
-      {/* 🔍 Filtros */}
+      {/* Filtros */}
       <div className="row mb-3">
         <div className="col-md-6">
           <input
@@ -196,7 +187,7 @@ function VistaTurnosClinica() {
         </div>
       </div>
 
-      {/* 🧾 Tabla */}
+      {/* Tabla */}
       <div className="table-responsive">
         <table className="table table-striped table-hover table-bordered align-middle">
           <thead className="table-primary">

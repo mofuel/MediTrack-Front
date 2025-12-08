@@ -23,29 +23,23 @@ function VistaPacienteInicio() {
   console.log("🔹 API_BASE_URL:", API_BASE_URL);
 
   useEffect(() => {
-    // ✅ Evitar ejecutar si faltan datos esenciales
     if (!codigoUsuario || !token) {
-      console.warn("⚠️ No se ejecuta fetchPerfilYCitas porque faltan datos del usuario o token");
+      console.warn("No se ejecuta fetchPerfilYCitas porque faltan datos del usuario o token");
       return;
     }
 
     const fetchPerfilYCitas = async () => {
       try {
-        console.log("🚀 Iniciando fetch de perfil y citas...");
 
-        // 🔹 PERFIL
         const perfilUrl = `${API_BASE_URL}/users/${codigoUsuario}`;
-        console.log("🌐 URL perfil:", perfilUrl);
 
         const resPerfil = await fetch(perfilUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("📩 Respuesta perfil:", resPerfil.status);
 
         if (resPerfil.ok) {
           const dataPerfil = await resPerfil.json();
-          console.log("✅ Perfil obtenido:", dataPerfil);
 
           setPerfil({
             nombre: dataPerfil.nombreCompleto || dataPerfil.nombre || "Paciente",
@@ -56,23 +50,19 @@ function VistaPacienteInicio() {
             sexo: dataPerfil.sexo || "",
           });
         } else {
-          console.warn("⚠️ No se pudo obtener el perfil. Status:", resPerfil.status);
+          console.warn("No se pudo obtener el perfil. Status:", resPerfil.status);
         }
 
-        // 🔹 CITAS
         const citasUrl = `${API_BASE_URL}/appointments/paciente/${codigoUsuario}`;
-        console.log("🌐 URL citas:", citasUrl);
 
         const resCitas = await fetch(citasUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("📩 Respuesta citas:", resCitas.status);
 
         if (!resCitas.ok) throw new Error(`Error al cargar citas (${resCitas.status})`);
         const dataCitas = await resCitas.json();
 
-        console.log("✅ Citas obtenidas (raw):", dataCitas);
 
         const citasAdaptadas = dataCitas.map((c) => ({
           id: c.id,
@@ -83,10 +73,9 @@ function VistaPacienteInicio() {
           especialidad: c.especialidadNombre || c.especialidadId,
         }));
 
-        console.log("📋 Citas adaptadas:", citasAdaptadas);
         setCitas(citasAdaptadas);
       } catch (err) {
-        console.error("❌ Error al cargar datos del paciente:", err);
+        console.error("Error al cargar datos del paciente:", err);
         Swal.fire("Error", "No se pudieron cargar los datos del paciente", "error");
       }
     };
@@ -94,7 +83,6 @@ function VistaPacienteInicio() {
     fetchPerfilYCitas();
   }, [codigoUsuario, token]); 
 
-  // 🔹 Calcular citas activas
   const hoy = new Date();
   const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(
     hoy.getDate()
@@ -110,9 +98,6 @@ function VistaPacienteInicio() {
 
   const citasHoy = citasActivas.filter((c) => c.fecha === hoyString);
 
-  console.log("📆 Citas activas:", citasActivas);
-  console.log("📅 Próxima cita:", proximaCita);
-  console.log("📅 Citas de hoy:", citasHoy);
 
   return (
     <main className="container my-4">

@@ -17,18 +17,15 @@ function DashboardAdmin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
 
-  // Contadores
   const [cantidadDoctores, setCantidadDoctores] = useState(0);
   const [cantidadPacientes, setCantidadPacientes] = useState(0);
 
-  // Inicializa especialidades solo si no existe
   useEffect(() => {
     if (!localStorage.getItem("especialidades")) {
       localStorage.setItem("especialidades", JSON.stringify([]));
     }
   }, []);
 
-  // Cargar cantidad de doctores y pacientes
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -44,14 +41,14 @@ function DashboardAdmin() {
         const doctores = data.filter(u => u.rol === "ROLE_MEDICO").length;
         const pacientes = data.filter(u => u.rol === "ROLE_PACIENTE").length;
 
-        console.log("Usuarios recibidos:", data); // <-- Aquí mostramos todos los usuarios
-        console.log("Cantidad Doctores:", doctores); // <-- Ver cantidad de doctores
-        console.log("Cantidad Pacientes:", pacientes); // <-- Ver cantidad de pacientes
+        console.log("Usuarios recibidos:", data); 
+        console.log("Cantidad Doctores:", doctores); 
+        console.log("Cantidad Pacientes:", pacientes); 
 
         setCantidadDoctores(doctores);
         setCantidadPacientes(pacientes);
       } catch (error) {
-        console.error("❌ Error al cargar cantidades:", error);
+        console.error("Error al cargar cantidades:", error);
       }
     };
 
@@ -114,7 +111,7 @@ function DashboardAdmin() {
   console.log("Props que se enviarán a VistaDashboard:", {
     cantidadDoctores,
     cantidadPacientes
-  }); // <-- Ver props justo antes de renderizar
+  }); 
 
   return (
     <div className="app-container">

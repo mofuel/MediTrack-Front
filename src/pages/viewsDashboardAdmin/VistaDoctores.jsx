@@ -29,7 +29,6 @@ function VistaDoctores() {
 
   const token = localStorage.getItem("token");
 
-  // ✅ Función para cargar doctores
   const cargarDoctores = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users`, {
@@ -50,7 +49,6 @@ function VistaDoctores() {
     }
   };
 
-  // ✅ Cargar doctores al montar
   useEffect(() => {
     const cargarDoctores = async () => {
       try {
@@ -76,7 +74,6 @@ function VistaDoctores() {
   }, [token]);
 
 
-  // 🔹 Abrir modal
   const abrirModal = (doctor = null) => {
     if (doctor) {
       setEditarDoctor(doctor.codigo);
@@ -105,7 +102,6 @@ function VistaDoctores() {
 
   const cerrarModal = () => setShowModal(false);
 
-  // 🔹 Guardar o editar doctor
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, apellido, dni, sexo, email, telefono, password, confirmPassword, estado } = formData;
@@ -161,7 +157,6 @@ function VistaDoctores() {
     }
   };
 
-  // 🔹 Eliminar doctor
   const handleEliminar = async (codigo) => {
     if (!window.confirm("¿Eliminar doctor?")) return;
     try {
@@ -177,7 +172,6 @@ function VistaDoctores() {
     }
   };
 
-  // 🔹 Filtrado y orden
   const doctoresFiltrados = doctores
     .filter((d) => d.nombre.toLowerCase().includes(busqueda.toLowerCase()))
     .sort((a, b) => (orden === "asc" ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre)));

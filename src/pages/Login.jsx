@@ -102,8 +102,8 @@ function Login() {
       const data = await res.json();
 
       // Debug completo de la respuesta
-      console.log("📦 Respuesta completa del backend:", data);
-      console.log("📍 tienePerfilMedico recibido:", data.tienePerfilMedico, "| tipo:", typeof data.tienePerfilMedico);
+      console.log("Respuesta completa del backend:", data);
+      console.log("tienePerfilMedico recibido:", data.tienePerfilMedico, "| tipo:", typeof data.tienePerfilMedico);
 
       // Guardar datos en localStorage
       localStorage.setItem("token", data.token);
@@ -112,7 +112,7 @@ function Login() {
       localStorage.setItem("nombreUsuario", data.nombre);
       localStorage.setItem("apellidoUsuario", data.apellido);
 
-      console.log("✅ Usuario autenticado:", data.nombre);
+      console.log("Usuario autenticado:", data.nombre);
       console.log("Rol:", data.rol);
       console.log("Código usuario:", data.codigo);
 
@@ -129,7 +129,7 @@ function Login() {
       redirectUser(data.rol, data.tienePerfilMedico);
 
     } catch (err) {
-      console.error("❌ Error en login:", err);
+      console.error("Error en login:", err);
       setError(err.message);
       Swal.fire({
         icon: "error",
@@ -141,7 +141,6 @@ function Login() {
     }
   };
 
-  // Función auxiliar para obtener mensaje según rol
   const getRolMessage = (rol, tienePerfilMedico) => {
     switch (rol) {
       case "ROLE_ADMIN":
@@ -157,12 +156,10 @@ function Login() {
     }
   };
 
-  // Función auxiliar para redirección
   const redirectUser = (rol, tienePerfilMedico) => {
-    // Convertir a booleano explícitamente para manejar strings "true"/"false"
     const tienePerfil = tienePerfilMedico === true || tienePerfilMedico === "true";
     
-    console.log("🔀 Redirigiendo con rol:", rol, "| tienePerfil:", tienePerfil);
+    console.log("Redirigiendo con rol:", rol, "| tienePerfil:", tienePerfil);
     
     switch (rol) {
       case "ROLE_ADMIN":
@@ -174,18 +171,17 @@ function Login() {
         break;
 
       case "ROLE_MEDICO":
-        // ✅ Usamos el flag que ya viene del backend
         if (tienePerfil) {
-          console.log("✅ Redirigiendo a index-medico");
+          console.log("Redirigiendo a index-medico");
           navigate("/index-medico");
         } else {
-          console.log("⚠️ Redirigiendo a crear-perfil-medico");
+          console.log("Redirigiendo a crear-perfil-medico");
           navigate("/crear-perfil-medico");
         }
         break;
 
       default:
-        console.warn("⚠️ Rol no reconocido:", rol);
+        console.warn("Rol no reconocido:", rol);
         navigate("/dashboard-paciente/inicio");
         break;
     }
@@ -295,7 +291,6 @@ function Login() {
         </Modal.Footer>
       </Modal>
 
-      {/* === Modal para ingresar token === */}
       <Modal show={showTokenModal} onHide={() => setShowTokenModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Verificar token</Modal.Title>

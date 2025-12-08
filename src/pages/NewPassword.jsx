@@ -7,6 +7,7 @@ import InputField from "../components/InputField";
 import Button from "../components/Button";
 import '../css/AuthLayout.css';
 import '../css/NewPassword.css';
+import API_BASE_URL from "../config";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function NewPassword() {
@@ -33,7 +34,7 @@ function NewPassword() {
         }
 
         try {
-            const res = await fetch("http://localhost:8080/password/reset", {
+            const res = await fetch(`${API_BASE_URL}/password/reset`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, token, newPassword })
@@ -42,7 +43,7 @@ function NewPassword() {
             if (!res.ok) throw new Error("No se pudo actualizar la contraseña");
 
             Swal.fire("Éxito", "Contraseña actualizada correctamente", "success")
-                .then(() => navigate("/")); // Redirige al login
+                .then(() => navigate("/")); 
         } catch (err) {
             Swal.fire("Error", err.message, "error");
         }

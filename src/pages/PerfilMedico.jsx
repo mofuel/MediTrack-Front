@@ -14,7 +14,6 @@ function PerfilMedico() {
   const codigoMedico = localStorage.getItem("codigoUsuario");
   const token = localStorage.getItem("token");
 
-  // 🟢 Obtener datos del perfil desde el backend
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
@@ -36,7 +35,7 @@ function PerfilMedico() {
           estado: data.activo ? "Activo" : "Inactivo",
         });
       } catch (error) {
-        console.error("❌ Error al cargar perfil:", error);
+        console.error("Error al cargar perfil:", error);
         Swal.fire("Error", "No se pudo cargar el perfil", "error");
       }
     };
@@ -46,13 +45,11 @@ function PerfilMedico() {
     }
   }, [codigoMedico, token]);
 
-  // 🟡 Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPerfil((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🟣 Guardar cambios en el backend
   const guardarCambios = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${perfil.codigo}`, {
@@ -81,9 +78,9 @@ function PerfilMedico() {
       });
       setEditando(false);
 
-      Swal.fire("✅ Perfil actualizado", "Los cambios se guardaron correctamente", "success");
+      Swal.fire("Perfil actualizado", "Los cambios se guardaron correctamente", "success");
     } catch (error) {
-      console.error("❌ Error al actualizar perfil:", error);
+      console.error("Error al actualizar perfil:", error);
       Swal.fire("Error", "No se pudo actualizar el perfil", "error");
     }
   };

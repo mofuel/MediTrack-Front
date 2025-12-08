@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer/Footer';
 import '../css/sede.css';
 import { Link } from 'react-router-dom';
-import laMolinaImg from '../assets/lamolina.png'; // Guarda la imagen como lamolina.png en src/assets/
+import laMolinaImg from '../assets/lamolina.png'; 
 
 const especialidadesLaMolina = [
   'Cardiología',

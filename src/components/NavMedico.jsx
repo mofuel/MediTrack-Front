@@ -57,7 +57,6 @@ function NavMedico() {
   }, []);
 
   const handleLogout = () => {
-    // Cerrar sesión correctamente
     localStorage.removeItem("token");
     localStorage.removeItem("rol");
     localStorage.removeItem("codigoUsuario");

@@ -142,7 +142,6 @@ function VistaCitas() {
       return;
     }
 
-    // Validar fecha y hora futuras
     const fechaHoraSeleccionada = new Date(`${formFecha}T${formHora}`);
     const ahora = new Date();
     if (fechaHoraSeleccionada <= ahora) {

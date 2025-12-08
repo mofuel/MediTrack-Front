@@ -35,7 +35,7 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
     const cargarEstadisticasCitas = async () => {
       try {
         setLoading(true);
-        console.log("📡 Obteniendo todas las citas...");
+        console.log("Obteniendo todas las citas...");
 
         // Obtener todas las citas (endpoint para administrador)
         const res = await fetch(`${API_BASE_URL}/appointments/all`, {
@@ -43,7 +43,7 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
         });
 
         if (!res.ok) {
-          console.warn("⚠️ No se pudieron obtener todas las citas, intentando con pendientes...");
+          console.warn(" No se pudieron obtener todas las citas, intentando con pendientes...");
           // Si falla, al menos obtener las pendientes
           const resPendientes = await fetch(`${API_BASE_URL}/appointments/pendientes`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -61,31 +61,25 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
         }
 
         const citas = await res.json();
-        console.log("✅ Citas obtenidas:", citas);
+        console.log("Citas obtenidas:", citas);
 
-        // Calcular fecha de hoy
         const hoy = new Date();
         const hoyString = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 
-        // Filtrar citas del día actual
         const citasDeHoy = citas.filter(c => c.fechaCita === hoyString);
 
-        // Contar por estado
         const pendientes = citas.filter(c => c.estado === "PENDIENTE").length;
         const aceptadas = citas.filter(c => c.estado === "ACEPTADA").length;
         const rechazadas = citas.filter(c => c.estado === "RECHAZADA").length;
 
-        // Agrupar citas por mes
         const citasPorMesMap = {};
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         
-        // Inicializar todos los meses en 0
         meses.forEach(mes => {
           citasPorMesMap[mes] = 0;
         });
 
-        // Contar citas por mes
         citas.forEach(cita => {
           if (cita.fechaCita) {
             const fecha = new Date(cita.fechaCita + "T00:00:00");
@@ -95,7 +89,6 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
           }
         });
 
-        // Convertir a array para el gráfico
         const citasPorMesArray = meses.map(mes => ({
           mes,
           citas: citasPorMesMap[mes]
@@ -112,7 +105,7 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
         setCitasPorMes(citasPorMesArray);
         setLoading(false);
       } catch (error) {
-        console.error("❌ Error al cargar estadísticas:", error);
+        console.error("Error al cargar estadísticas:", error);
         setLoading(false);
       }
     };
@@ -120,12 +113,11 @@ function VistaDashboard({ cantidadDoctores, cantidadPacientes }) {
     cargarEstadisticasCitas();
   }, [token]);
 
-  // Datos para el gráfico de torta (estado de citas)
   const estadoCitas = [
     { name: "Aceptadas", value: stats.citasAceptadas },
     { name: "Rechazadas", value: stats.citasRechazadas },
     { name: "Pendientes", value: stats.citasPendientes },
-  ].filter(item => item.value > 0); // Solo mostrar si hay datos
+  ].filter(item => item.value > 0); 
 
   const colores = ["#4caf50", "#f44336", "#ff9800"];
 

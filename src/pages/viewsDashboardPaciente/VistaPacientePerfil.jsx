@@ -17,7 +17,6 @@ function VistaPacientePerfil() {
   });
   const [editando, setEditando] = useState(false);
 
-  // 🔹 Cargar perfil desde el backend
   useEffect(() => {
     const codigo = localStorage.getItem("codigoUsuario");
     const token = localStorage.getItem("token");
@@ -51,14 +50,12 @@ function VistaPacientePerfil() {
         console.error(err);
         Swal.fire("Error", "No se pudo cargar el perfil", "error");
       });
-  }, []); // ✅ No hay warning porque API_BASE_URL es constante (no cambia)
+  }, []); 
 
-  // 🔹 Actualizar valores del formulario
   const handleChange = (e) => {
     setPerfil({ ...perfil, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Guardar cambios en el backend
   const guardarCambios = async (e) => {
     e.preventDefault();
     const codigo = localStorage.getItem("codigoUsuario");
@@ -83,7 +80,7 @@ function VistaPacientePerfil() {
 
       Swal.fire({
         title: "¡Perfil actualizado!",
-        text: "Tus datos han sido guardados correctamente ✅",
+        text: "Tus datos han sido guardados correctamente",
         icon: "success",
         confirmButtonText: "Aceptar",
       });

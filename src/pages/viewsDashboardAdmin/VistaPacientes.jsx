@@ -23,7 +23,6 @@ function VistaPacientes() {
 
   const token = localStorage.getItem("token");
 
-  // ✅ Cargar pacientes desde la API
   useEffect(() => {
     const fetchPacientes = async () => {
       try {
@@ -39,7 +38,7 @@ function VistaPacientes() {
         const pacientesRol = data.filter((u) => u.rol === "ROLE_PACIENTE");
         setPacientes(pacientesRol);
       } catch (error) {
-        console.error("❌ Error al cargar pacientes:", error);
+        console.error("Error al cargar pacientes:", error);
         Swal.fire("Error", "No se pudieron cargar los pacientes", "error");
       }
     };
@@ -47,7 +46,6 @@ function VistaPacientes() {
     fetchPacientes();
   }, [token]);
 
-  // ✅ Abrir modal (editar o nuevo)
   const abrirModal = (paciente = null) => {
     if (paciente) {
       setEditarPaciente(paciente.codigo);
@@ -75,7 +73,6 @@ function VistaPacientes() {
 
   const cerrarModal = () => setShowModal(false);
 
-  // ✅ Guardar cambios (nuevo o edición)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,7 +95,6 @@ function VistaPacientes() {
 
       let response;
       if (editarPaciente) {
-        // 🔄 Actualizar
         response = await fetch(`${API_BASE_URL}/users/${editarPaciente}`, {
           method: "PUT",
           headers: {
@@ -108,7 +104,6 @@ function VistaPacientes() {
           body: JSON.stringify(payload),
         });
       } else {
-        // ➕ Registrar nuevo
         response = await fetch(`${API_BASE_URL}/users/register`, {
           method: "POST",
           headers: {
@@ -137,7 +132,6 @@ function VistaPacientes() {
         showConfirmButton: false,
       });
 
-      // 🔄 Refrescar lista
       const updatedList = await fetch(`${API_BASE_URL}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -146,12 +140,11 @@ function VistaPacientes() {
 
       cerrarModal();
     } catch (error) {
-      console.error("❌ Error al guardar paciente:", error);
+      console.error("Error al guardar paciente:", error);
       Swal.fire("Error", "Hubo un problema al guardar el paciente", "error");
     }
   };
 
-  // Eliminar
   const handleEliminar = async (codigo) => {
     const confirmacion = await Swal.fire({
       title: "¿Eliminar paciente?",
@@ -183,12 +176,12 @@ function VistaPacientes() {
       Swal.fire({
         icon: "success",
         title: "Eliminado",
-        text: "✅ Paciente eliminado correctamente",
+        text: "Paciente eliminado correctamente",
         timer: 1800,
         showConfirmButton: false
       });
     } catch (error) {
-      console.error("❌ Error al eliminar paciente:", error);
+      console.error("Error al eliminar paciente:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -198,7 +191,6 @@ function VistaPacientes() {
   };
 
 
-  // 🔍 Filtro + orden
   const pacientesFiltrados = pacientes
     .filter((p) => p.nombre?.toLowerCase().includes(busqueda.toLowerCase()))
     .sort((a, b) =>
@@ -216,7 +208,7 @@ function VistaPacientes() {
         <Button text="Agregar Paciente" onClick={() => abrirModal()} />
       </div>
 
-      {/* 🔍 Filtros */}
+      {/* Filtros */}
       <div className="row mb-3">
         <div className="col-md-6">
           <input
@@ -239,7 +231,7 @@ function VistaPacientes() {
         </div>
       </div>
 
-      {/* 🧾 Tabla */}
+      {/* Tabla */}
       <div className="table-responsive">
         <table className="table table-striped table-hover table-bordered align-middle">
           <thead className="table-primary">

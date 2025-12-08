@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Card, Form } from "react-bootstrap";
 import NavMedico from "../components/NavMedico";
-import EstadoBadge from "../components/EstadoBadge";
 import FiltroEstado from "../components/FiltroEstado";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
@@ -18,17 +17,29 @@ function HistorialCitas() {
   const codigoMedico = localStorage.getItem("codigoUsuario");
   const token = localStorage.getItem("token");
 
+  // 🔹 Función para definir el color del badge según el estado
+  const getBadgeClass = (estado) => {
+    const estadoUpper = estado?.toUpperCase() || "";
+    switch (estadoUpper) {
+      case "ACEPTADA":
+        return "badge bg-success";
+      case "PENDIENTE":
+        return "badge bg-warning text-dark";
+      case "RECHAZADA":
+        return "badge bg-danger";
+      default:
+        return "badge bg-secondary";
+    }
+  };
+
   useEffect(() => {
     if (!codigoMedico || !token) {
-      console.warn("⚠️ Falta token o código de médico");
+      console.warn("Falta token o código de médico");
       return;
     }
 
     const cargarCitas = async () => {
       try {
-        console.log("📡 Cargando historial de citas del médico:", codigoMedico);
-
-        // 🔹 Obtener datos del médico
         const resPerfil = await fetch(`${API_BASE_URL}/users/${codigoMedico}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -42,19 +53,14 @@ function HistorialCitas() {
           setNombreMedico(nombreCompleto);
         }
 
-        // 🔹 Obtener citas del médico
         const resCitas = await fetch(`${API_BASE_URL}/appointments/medico/${codigoMedico}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!resCitas.ok) {
-          throw new Error(`Error al cargar citas: ${resCitas.status}`);
-        }
+        if (!resCitas.ok) throw new Error(`Error al cargar citas: ${resCitas.status}`);
 
         const data = await resCitas.json();
-        console.log("✅ Citas obtenidas:", data);
 
-        // 🔹 Adaptar formato a lo que usa tu tabla
         const citasAdaptadas = data.map((c) => ({
           id: c.id,
           paciente: c.pacienteNombre || c.pacienteId,
@@ -65,7 +71,7 @@ function HistorialCitas() {
 
         setCitas(citasAdaptadas);
       } catch (err) {
-        console.error("❌ Error al cargar citas:", err);
+        console.error("Error al cargar citas:", err);
         Swal.fire("Error", "No se pudo cargar el historial de citas", "error");
       }
     };
@@ -73,14 +79,9 @@ function HistorialCitas() {
     cargarCitas();
   }, [codigoMedico, token]);
 
-  // 🔹 Filtrado
   const citasFiltradas = citas
-    .filter((c) =>
-      c.paciente.toLowerCase().includes(filtroNombre.toLowerCase())
-    )
-    .filter((c) =>
-      filtroEstado === "todos" ? true : c.estado === filtroEstado
-    );
+    .filter((c) => c.paciente.toLowerCase().includes(filtroNombre.toLowerCase()))
+    .filter((c) => (filtroEstado === "todos" ? true : c.estado === filtroEstado));
 
   return (
     <>
@@ -134,7 +135,7 @@ function HistorialCitas() {
                         {c.hora}
                       </td>
                       <td>
-                        <EstadoBadge estado={c.estado} />
+                        <span className={getBadgeClass(c.estado)}>{c.estado}</span>
                       </td>
                     </tr>
                   ))}

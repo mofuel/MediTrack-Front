@@ -20,7 +20,6 @@ function VistaPacienteCitas() {
   const [medicosFiltrados, setMedicosFiltrados] = useState([]);
   const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState([]);
 
-  // Cargar citas del paciente
   useEffect(() => {
     const fetchCitas = async () => {
       try {
@@ -37,7 +36,6 @@ function VistaPacienteCitas() {
     fetchCitas();
   }, [codigoUsuario, token]);
 
-  // Cargar especialidades
   useEffect(() => {
     const fetchEspecialidades = async () => {
       try {
@@ -83,9 +81,10 @@ function VistaPacienteCitas() {
       }
     }
 
+
+
     setNuevaCita((prev) => ({ ...prev, [name]: value }));
 
-    // Cargar médicos si cambia la especialidad
     if (name === "especialidadId" && value) {
       try {
         const res = await fetch(`${API_BASE_URL}/perfil-medico/especialidad/${value}`, {
@@ -101,7 +100,6 @@ function VistaPacienteCitas() {
     }
   };
 
-  // Guardar nueva cita
   const handleGuardarCita = async () => {
     if (!nuevaCita.fechaCita || !nuevaCita.horaCita || !nuevaCita.especialidadId || !nuevaCita.medicoId) {
       Swal.fire("Campos incompletos", "Completa todos los campos", "warning");
@@ -156,6 +154,21 @@ function VistaPacienteCitas() {
     }
   };
 
+  const getBadgeClass = (estado) => {
+    const estadoUpper = estado?.toUpperCase() || "";
+    switch (estadoUpper) {
+      case "ACEPTADA":
+        return "bg-success";
+      case "PENDIENTE":
+        return "bg-warning text-dark";
+      case "RECHAZADA":
+        return "bg-danger";
+      default:
+        return "bg-secondary";
+    }
+  };
+
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -188,7 +201,11 @@ function VistaPacienteCitas() {
                   <td>{c.horaCita}</td>
                   <td>{c.especialidadNombre || c.especialidadId}</td>
                   <td>{c.medicoNombre || c.medicoId}</td>
-                  <td><EstadoBadge estado={c.estado} /></td>
+                  <td>
+                    <span className={`badge ${getBadgeClass(c.estado)}`}>
+                      {c.estado}
+                    </span>
+                  </td>
                 </tr>
               ))
             )}
@@ -205,51 +222,69 @@ function VistaPacienteCitas() {
                 <button className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body">
-                <InputField
-                  type="date"
-                  name="fechaCita"
-                  value={nuevaCita.fechaCita}
-                  onChange={handleChange}
-                />
-                <InputField
-                  type="time"
-                  name="horaCita"
-                  value={nuevaCita.horaCita}
-                  onChange={handleChange}
-                />
+                <div className="mb-2">
+                  <label htmlFor="fechaCita" className="form-label">Fecha de la cita</label>
+                  <InputField
+                    type="date"
+                    name="fechaCita"
+                    id="fechaCita"
+                    value={nuevaCita.fechaCita}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <select
-                  className="form-select my-2"
-                  name="especialidadId"
-                  value={nuevaCita.especialidadId}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccione especialidad</option>
-                  {especialidadesDisponibles.map((e) => (
-                    <option key={e.id} value={e.id}>
-                      {e.nombre}
-                    </option>
-                  ))}
-                </select>
+                <div className="mb-2">
+                  <label htmlFor="horaCita" className="form-label">Hora de la cita</label>
+                  <InputField
+                    type="time"
+                    name="horaCita"
+                    id="horaCita"
+                    value={nuevaCita.horaCita}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <select
-                  className="form-select my-2"
-                  name="medicoId"
-                  value={nuevaCita.medicoId}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    {medicosFiltrados.length === 0
-                      ? "Primero seleccione una especialidad"
-                      : "Seleccione doctor"}
-                  </option>
-                  {medicosFiltrados.map((m) => (
-                    <option key={m.codigoUsuario} value={m.codigoUsuario}>
-                      {m.nombreCompleto}
+                <div className="mb-2">
+                  <label htmlFor="especialidadId" className="form-label">Especialidad</label>
+                  <select
+                    className="form-select"
+                    name="especialidadId"
+                    id="especialidadId"
+                    value={nuevaCita.especialidadId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccione especialidad</option>
+                    {especialidadesDisponibles.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-2">
+                  <label htmlFor="medicoId" className="form-label">Doctor</label>
+                  <select
+                    className="form-select"
+                    name="medicoId"
+                    id="medicoId"
+                    value={nuevaCita.medicoId}
+                    onChange={handleChange}
+                  >
+                    <option value="">
+                      {medicosFiltrados.length === 0
+                        ? "Primero seleccione una especialidad"
+                        : "Seleccione doctor"}
                     </option>
-                  ))}
-                </select>
+                    {medicosFiltrados.map((m) => (
+                      <option key={m.codigoUsuario} value={m.codigoUsuario}>
+                        {m.nombreCompleto}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
 
               <div className="modal-footer">
                 <Button text="Cancelar" onClick={() => setShowModal(false)} className="btn-secondary" />

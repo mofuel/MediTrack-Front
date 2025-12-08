@@ -14,7 +14,7 @@ function CrearPerfilMedico() {
   const formatearHora = (hora) => {
     if (!hora) return "";
     if (typeof hora === "string") {
-      return hora.slice(0, 5); // → "08:00"
+      return hora.slice(0, 5); 
     }
     const fecha = new Date(hora);
     const horas = fecha.getUTCHours().toString().padStart(2, "0");
@@ -52,11 +52,9 @@ function CrearPerfilMedico() {
 }, []);
 
 
-  // Cargar especialidades y turnos desde el backend
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Obtener especialidades
     fetch(`${API_BASE_URL}/specialties`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -67,9 +65,8 @@ function CrearPerfilMedico() {
       .then((data) => {
         setEspecialidades(data);
       })
-      .catch((err) => console.error("❌ Error especialidades:", err));
+      .catch((err) => console.error("Error especialidades:", err));
 
-    // Obtener turnos
     fetch(`${API_BASE_URL}/turnos`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -80,10 +77,9 @@ function CrearPerfilMedico() {
       .then((data) => {
         setTurnos(data);
       })
-      .catch((err) => console.error("❌ Error turnos:", err));
+      .catch((err) => console.error("Error turnos:", err));
   }, []);
 
-  // Seleccionar o deseleccionar especialidades
   const toggleEspecialidad = (e) => {
     const id = Number(e.target.value);
     setSelectedEspecialidades((prev) =>
@@ -91,12 +87,10 @@ function CrearPerfilMedico() {
     );
   };
 
-  // Seleccionar turno (solo uno)
   const toggleTurno = (turnoId) => {
     setTurnosSeleccionados([turnoId]);
   };
 
-  // Guardar perfil
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -135,7 +129,7 @@ function CrearPerfilMedico() {
         () => (window.location.href = "/index-medico")
       );
     } catch (error) {
-      console.error("❌ Error al guardar perfil médico:", error);
+      console.error("Error al guardar perfil médico:", error);
       Swal.fire("Error", "No se pudo guardar el perfil", "error");
     }
   };
