@@ -53,100 +53,99 @@ function RegistroForm() {
         }
 
         try {
-            const resp = await fetch(`${API_BASE_URL}/users/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form)
-            });
+    const resp = await fetch(`${API_BASE_URL}/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+    });
 
+    if (!resp.ok) {
+        // Manejo de errores amigable
+        const errorData = await resp.json().catch(() => null);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorData?.error || 'Ocurrió un error al registrar el usuario'
+        });
+        return;
+    }
 
-            if (!resp.ok) {
-                const text = await resp.text();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: text
-                });
-                return;
-            }
+    const data = await resp.json();
 
-            const data = await resp.json();
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("rol", data.rol);
+    localStorage.setItem("codigoUsuario", data.codigo);
+    localStorage.setItem("nombreUsuario", data.nombre);
+    localStorage.setItem("apellidoUsuario", data.apellido);
 
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("rol", data.rol);
-            localStorage.setItem("codigoUsuario", data.codigo);
-            localStorage.setItem("nombreUsuario", data.nombre);
-            localStorage.setItem("apellidoUsuario", data.apellido);
-            
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+    const citasExistentes = usuarios[data.codigo]?.citas || [];
 
+    const user = {
+        codigo: data.codigo ?? "",
+        nombre: data.nombre ?? "",
+        apellido: data.apellido ?? "",
+        dni: data.dni ?? "",
+        sexo: data.sexo ?? "",
+        email: data.email ?? "",
+        telefono: data.telefono ?? "",
+        rol: data.rol,
+        estado: data.estado ?? "Activo",
+        citas: citasExistentes,
+        especialidades: usuarios[data.codigo]?.especialidades || [],
+        turnos: usuarios[data.codigo]?.turnos || [],
+    };
 
-            const usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
-            const citasExistentes = usuarios[data.codigo]?.citas || [];
+    usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
-            const user = {
-                codigo: data.codigo ?? "",
-                nombre: data.nombre ?? "",
-                apellido: data.apellido ?? "",
-                dni: data.dni ?? "",
-                sexo: data.sexo ?? "",
-                email: data.email ?? "",
-                telefono: data.telefono ?? "",
-                rol: data.rol,
-                estado: data.estado ?? "Activo",
-                citas: citasExistentes,
-                especialidades: usuarios[data.codigo]?.especialidades || [],
-                turnos: usuarios[data.codigo]?.turnos || [],
-            };
-
-            usuarios[data.codigo] = { ...usuarios[data.codigo], ...user };
-            localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Registro exitoso',
-                text: 'Tu cuenta ha sido creada correctamente',
-                timer: 1500,
-                showConfirmButton: false
-            }).then(() => {
-                switch (data.rol) {
-                    case "ROLE_ADMIN":
-                        window.location.href = "/dashboard-admin";
-                        break;
-                    case "ROLE_MEDICO": {
-                        const tienePerfil = (user.especialidades?.length || 0) > 0 && (user.turnos?.length || 0) > 0;
-                        if (!tienePerfil) {
-                            window.location.href = "/crear-perfil-medico";
-                        } else {
-                            window.location.href = "/index-medico";
-                        }
-                        break;
-                    }
-                    case "ROLE_PACIENTE":
-                    default:
-                        window.location.href = "/dashboard-paciente/inicio";
-                        break;
+    Swal.fire({
+        icon: 'success',
+        title: 'Registro exitoso',
+        text: 'Tu cuenta ha sido creada correctamente',
+        timer: 1500,
+        showConfirmButton: false
+    }).then(() => {
+        switch (data.rol) {
+            case "ROLE_ADMIN":
+                window.location.href = "/dashboard-admin";
+                break;
+            case "ROLE_MEDICO": {
+                const tienePerfil = (user.especialidades?.length || 0) > 0 && (user.turnos?.length || 0) > 0;
+                if (!tienePerfil) {
+                    window.location.href = "/crear-perfil-medico";
+                } else {
+                    window.location.href = "/index-medico";
                 }
-            });
-
-            setForm({
-                nombre: "",
-                apellido: "",
-                dni: "",
-                telefono: "",
-                email: "",
-                sexo: "",
-                password: "",
-                confirmPassword: ""
-            });
-
-        } catch (err) {
-            console.error(err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'No se pudo conectar con el servidor',
-            });
+                break;
+            }
+            case "ROLE_PACIENTE":
+            default:
+                window.location.href = "/dashboard-paciente/inicio";
+                break;
         }
+    });
+
+    setForm({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        telefono: "",
+        email: "",
+        sexo: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+} catch (err) {
+    console.error(err);
+    Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'No se pudo conectar con el servidor',
+    });
+}
+
     };
 
     return (
@@ -157,7 +156,6 @@ function RegistroForm() {
                 </section>
 
                 <section className="form-columns">
-                    {/* Columna izquierda */}
                     <article className="column">
                         {/* Nombre */}
                         <section className="mb-3 input-group">
@@ -191,7 +189,9 @@ function RegistroForm() {
                                 id="dni"
                                 placeholder="DNI"
                                 value={form.dni}
+                                maxLength={8}
                                 onChange={handleChange}
+                                onInput={(e) => e.target.value = e.target.value.replace(/\D/g,'')}
                             />
                         </section>
 
@@ -203,12 +203,13 @@ function RegistroForm() {
                                 id="telefono"
                                 placeholder="Teléfono"
                                 value={form.telefono}
+                                maxLength={9}
                                 onChange={handleChange}
+                                onInput={(e) => e.target.value = e.target.value.replace(/\D/g,'')}
                             />
                         </section>
                     </article>
 
-                    {/* Columna derecha */}
                     <article className="column">
                         {/* Email */}
                         <section className="mb-3 input-group">
