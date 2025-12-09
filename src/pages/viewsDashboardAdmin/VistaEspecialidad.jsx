@@ -14,7 +14,11 @@ function VistaEspecialidad() {
         const response = await fetch(`${API_BASE_URL}/specialties`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!response.ok) throw new Error("Error al obtener especialidades");
+        if (!response.ok) {
+          const errData = await response.json().catch(() => null);
+          throw new Error(errData?.error || "Ocurrió un error al crear la especialidad");
+        }
+
         const data = await response.json();
         setEspecialidades(data);
       } catch (error) {
@@ -62,13 +66,15 @@ function VistaEspecialidad() {
         body: JSON.stringify({ nombre: nombre.trim() }),
       });
 
-      if (!response.ok) throw new Error("Error al crear especialidad");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
+        throw new Error(errData?.error || "Ocurrió un error al crear la especialidad");
+      }
 
       Swal.fire("Agregado", "La especialidad fue registrada correctamente", "success");
       cargarEspecialidades();
     } catch (error) {
-      console.error("Error al agregar especialidad:", error);
-      Swal.fire("Error", "No se pudo agregar la especialidad", "error");
+      Swal.fire("Error", error.message, "error");
     }
   };
 
@@ -93,15 +99,18 @@ function VistaEspecialidad() {
         body: JSON.stringify({ nombre: nuevoNombre.trim() }),
       });
 
-      if (!response.ok) throw new Error("Error al actualizar especialidad");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
+        throw new Error(errData?.error || "Ocurrió un error al actualizar la especialidad");
+      }
 
       Swal.fire("Actualizado", "La especialidad fue modificada", "success");
       cargarEspecialidades();
     } catch (error) {
-      console.error("Error al editar especialidad:", error);
-      Swal.fire("Error", "No se pudo editar la especialidad", "error");
+      Swal.fire("Error", error.message, "error");
     }
   };
+
 
   const handleEliminar = async (id) => {
     const result = await Swal.fire({
