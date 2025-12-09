@@ -57,40 +57,45 @@ function VistaPacientePerfil() {
   };
 
   const guardarCambios = async (e) => {
-    e.preventDefault();
-    const codigo = localStorage.getItem("codigoUsuario");
-    const token = localStorage.getItem("token");
+  e.preventDefault();
+  const codigo = localStorage.getItem("codigoUsuario");
+  const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(perfil),
-      });
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${codigo}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(perfil),
+    });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Error al actualizar");
-      }
-
-      const data = await response.json();
-
-      Swal.fire({
-        title: "¡Perfil actualizado!",
-        text: "Tus datos han sido guardados correctamente",
-        icon: "success",
-        confirmButtonText: "Aceptar",
-      });
-
-      setPerfil(data);
-      setEditando(false);
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
+    // Si la respuesta no es ok, intentamos leer el JSON del error
+    if (!response.ok) {
+      const errData = await response.json().catch(() => null);
+      throw new Error(errData?.error || "Ocurrió un error al actualizar el perfil");
     }
-  };
+
+    // Si todo está bien, leemos la respuesta
+    const data = await response.json();
+
+    Swal.fire({
+      title: "¡Perfil actualizado!",
+      text: "Tus datos han sido guardados correctamente",
+      icon: "success",
+      confirmButtonText: "Aceptar",
+    });
+
+    setPerfil(data);
+    setEditando(false);
+  } catch (err) {
+    // Mostramos el mensaje de error recibido del backend
+    Swal.fire("Error", err.message, "error");
+  }
+};
+
+
 
   const opcionesSexo = [
     { value: "MASCULINO", label: "Masculino" },
