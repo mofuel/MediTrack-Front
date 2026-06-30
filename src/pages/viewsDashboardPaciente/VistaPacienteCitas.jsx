@@ -93,6 +93,23 @@ function VistaPacienteCitas() {
         Swal.fire("Error", "No se pudieron cargar los médicos", "error");
       }
     }
+    if (name === "medicoId" || name === "fechaCita") {
+    const medico = name === "medicoId" ? value : nuevaCita.medicoId;
+    const fecha = name === "fechaCita" ? value : nuevaCita.fechaCita;
+
+    if (medico && fecha) {
+      setSlotsLoading(true);
+      const res = await fetch(
+        `${API_BASE_URL}/appointments/slots?medicoId=${medico}&fecha=${fecha}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setSlotsDisponibles(data.filter(s => s.disponible));
+      }
+      setSlotsLoading(false);
+    }
+  }
   };
 
 
@@ -169,23 +186,7 @@ function VistaPacienteCitas() {
     return "bg-secondary";
   };
 
-  if (name === "medicoId" || name === "fechaCita") {
-    const medico = name === "medicoId" ? value : nuevaCita.medicoId;
-    const fecha = name === "fechaCita" ? value : nuevaCita.fechaCita;
-
-    if (medico && fecha) {
-      setSlotsLoading(true);
-      const res = await fetch(
-        `${API_BASE_URL}/appointments/slots?medicoId=${medico}&fecha=${fecha}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setSlotsDisponibles(data.filter(s => s.disponible));
-      }
-      setSlotsLoading(false);
-    }
-  }
+  
 
   return (
     <div className="container mt-4">
