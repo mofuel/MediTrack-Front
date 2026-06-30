@@ -109,10 +109,8 @@ function CrearPerfilMedico() {
     try {
       const perfilPayload = {
         codigoUsuario,
-        especialidades: selectedEspecialidades.map((id) => ({ id })), 
-        turnos: turnosSeleccionados.map((id) => ({ id })), 
+        especialidades: selectedEspecialidades.map((id) => ({ id })),
       };
-
 
       const response = await fetch(`${API_BASE_URL}/perfil-medico/create`, {
         method: "POST",
@@ -124,6 +122,23 @@ function CrearPerfilMedico() {
       });
 
       if (!response.ok) throw new Error("Error al guardar perfil médico");
+
+      const perfilCreado = await response.json();
+
+      for (let dia = 1; dia <= 6; dia++) {
+        await fetch(`${API_BASE_URL}/medic-shifts/assign`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            perfilId: perfilCreado.id,
+            turnoId: turnosSeleccionados[0],
+            diaSemana: dia,
+          }),
+        });
+      }
 
       Swal.fire("Perfil guardado", "Tu perfil de médico fue creado", "success").then(
         () => (window.location.href = "/index-medico")
