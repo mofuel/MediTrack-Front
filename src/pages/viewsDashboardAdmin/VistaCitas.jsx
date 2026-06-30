@@ -10,6 +10,8 @@ function VistaCitas() {
   const [orden, setOrden] = useState("asc");
   const [citas, setCitas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [slotsDisponibles, setSlotsDisponibles] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
   const [pacientes, setPacientes] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
@@ -33,6 +35,28 @@ function VistaCitas() {
     cargarDatos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  useEffect(() => {
+    if (!formDoctor || !formFecha) {
+      setSlotsDisponibles([]);
+      return;
+    }
+    const fetchSlots = async () => {
+      setSlotsLoading(true);
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/appointments/slots?medicoId=${formDoctor}&fecha=${formFecha}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSlotsDisponibles(data.filter(s => s.disponible));
+        }
+      } catch { /* ignore */ }
+      setSlotsLoading(false);
+    };
+    fetchSlots();
+  }, [formDoctor, formFecha, token]);
 
   const cargarDatos = async () => {
     try {
@@ -399,11 +423,26 @@ function VistaCitas() {
             {/* Hora */}
             <Form.Group className="mb-2">
               <Form.Label>Hora</Form.Label>
-              <Form.Control
-                type="time"
-                value={formHora}
-                onChange={(e) => setFormHora(e.target.value)}
-              />
+              {!formDoctor || !formFecha ? (
+                <p className="text-muted small mt-1">Selecciona un doctor y fecha primero</p>
+              ) : slotsLoading ? (
+                <p className="text-muted small mt-1">Cargando horarios...</p>
+              ) : slotsDisponibles.length === 0 ? (
+                <p className="text-danger small mt-1">No hay horarios disponibles para esta fecha</p>
+              ) : (
+                <div className="d-flex flex-wrap gap-2 mt-1">
+                  {slotsDisponibles.map((slot) => (
+                    <button
+                      key={slot.horaInicio}
+                      type="button"
+                      className={`btn btn-sm ${formHora === slot.horaInicio ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => setFormHora(slot.horaInicio)}
+                    >
+                      {slot.horaInicio.slice(0, 5)}
+                    </button>
+                  ))}
+                </div>
+              )}
             </Form.Group>
 
             {/* Estado */}

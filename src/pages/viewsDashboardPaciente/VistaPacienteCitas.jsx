@@ -20,6 +20,9 @@ function VistaPacienteCitas() {
   const [medicosFiltrados, setMedicosFiltrados] = useState([]);
   const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState([]);
 
+  const [slotsDisponibles, setSlotsDisponibles] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+
   useEffect(() => {
     const fetchCitas = async () => {
       try {
@@ -61,36 +64,36 @@ function VistaPacienteCitas() {
 
 
   const handleChange = async (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  if (name === "fechaCita") {
-    const hoy = new Date().toISOString().split("T")[0];
-    if (value < hoy) {
-      Swal.fire("Fecha inválida", "No puedes seleccionar una fecha pasada", "warning");
-      return;
+    if (name === "fechaCita") {
+      const hoy = new Date().toISOString().split("T")[0];
+      if (value < hoy) {
+        Swal.fire("Fecha inválida", "No puedes seleccionar una fecha pasada", "warning");
+        return;
+      }
     }
-  }
 
-  setNuevaCita((prev) => ({ ...prev, [name]: value }));
+    setNuevaCita((prev) => ({ ...prev, [name]: value }));
 
-  if (name === "especialidadId") {
-    try {
-      const res = await fetch(
-        `${API_BASE_URL}/perfil-medico/especialidad/${value}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    if (name === "especialidadId") {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/perfil-medico/especialidad/${value}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error();
 
-      const data = await res.json();
-      setMedicosFiltrados(data);
+        const data = await res.json();
+        setMedicosFiltrados(data);
 
-      setNuevaCita((prev) => ({ ...prev, medicoId: "" }));
-    } catch {
-      Swal.fire("Error", "No se pudieron cargar los médicos", "error");
+        setNuevaCita((prev) => ({ ...prev, medicoId: "" }));
+      } catch {
+        Swal.fire("Error", "No se pudieron cargar los médicos", "error");
+      }
     }
-  }
-};
+  };
 
 
   const handleGuardarCita = async () => {
@@ -166,6 +169,24 @@ function VistaPacienteCitas() {
     return "bg-secondary";
   };
 
+  if (name === "medicoId" || name === "fechaCita") {
+    const medico = name === "medicoId" ? value : nuevaCita.medicoId;
+    const fecha = name === "fechaCita" ? value : nuevaCita.fechaCita;
+
+    if (medico && fecha) {
+      setSlotsLoading(true);
+      const res = await fetch(
+        `${API_BASE_URL}/appointments/slots?medicoId=${medico}&fecha=${fecha}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setSlotsDisponibles(data.filter(s => s.disponible));
+      }
+      setSlotsLoading(false);
+    }
+  }
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -234,12 +255,25 @@ function VistaPacienteCitas() {
 
                 <div className="mb-2">
                   <label className="form-label">Hora de la cita</label>
-                  <InputField
-                    type="time"
-                    name="horaCita"
-                    value={nuevaCita.horaCita}
-                    onChange={handleChange}
-                  />
+                  {!nuevaCita.medicoId || !nuevaCita.fechaCita ? (
+                    <p className="text-muted small">Selecciona un doctor y fecha primero</p>
+                  ) : slotsLoading ? (
+                    <p className="text-muted small">Cargando horarios...</p>
+                  ) : slotsDisponibles.length === 0 ? (
+                    <p className="text-danger small">No hay horarios disponibles para esta fecha</p>
+                  ) : (
+                    <div className="d-flex flex-wrap gap-2">
+                      {slotsDisponibles.map((slot) => (
+                        <button
+                          key={slot.horaInicio}
+                          className={`btn btn-sm ${nuevaCita.horaCita === slot.horaInicio ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => setNuevaCita(prev => ({ ...prev, horaCita: slot.horaInicio }))}
+                        >
+                          {slot.horaInicio.slice(0, 5)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-2">
